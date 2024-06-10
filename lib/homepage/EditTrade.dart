@@ -6,41 +6,47 @@ import 'dart:io'; // For File
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../colors/colors.dart';
 
-class EditPost extends StatefulWidget {
-  final int postId;
+class EditTradePage extends StatefulWidget {
+  final int tradeId;
   final String initialTitle;
   final String initialContent;
   final List<String>? boardImageList;
-  const EditPost({
+  final String initialLocation;
+  final String initialPrice; // New field for initial price
+  const EditTradePage({
     Key? key,
-    required this.postId,
+    required this.tradeId,
     required this.initialTitle,
     required this.initialContent,
     required this.boardImageList,
+    required this.initialLocation,
+    required this.initialPrice, // Update constructor
   }) : super(key: key);
-
   @override
-  _EditPostState createState() => _EditPostState();
+  _EditTradeState createState() => _EditTradeState();
 }
 
-class _EditPostState extends State<EditPost> {
+class _EditTradeState extends State<EditTradePage> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   List<String>? _boardImageList;
   final ImagePicker _picker = ImagePicker();
+  late TextEditingController _locationController;
+  late TextEditingController _priceController;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.initialTitle);
     _contentController = TextEditingController(text: widget.initialContent);
+    _locationController = TextEditingController(text: widget.initialLocation);
+    _priceController = TextEditingController(text: widget.initialPrice.toString());
     if (widget.boardImageList != null) {
       _boardImageList = List.from(widget.boardImageList!); // Initialize if not null
     }
   }
-
-  Future<void> _patchPost() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/board/${widget.postId}';
+  Future<void> _patchTrade() async {
+    final String uri = 'http://10.0.2.2:4000/api/v1/trade-board/${widget.tradeId}';
     try {
       final prefs = await SharedPreferences.getInstance();
       final jwtToken = prefs.getString('jwtToken');
@@ -53,6 +59,8 @@ class _EditPostState extends State<EditPost> {
         body: json.encode({
           'title': _titleController.text,
           'content': _contentController.text,
+          'tradeLocation' : _locationController.text,
+          'price' : _priceController.text,
           'boardImageList': _boardImageList, // Include the image URL
         }),
       );
@@ -76,14 +84,14 @@ class _EditPostState extends State<EditPost> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _boardImageList?.add(pickedFile.path); // Add the selected image to the list
+        _boardImageList = [..._boardImageList ?? [], pickedFile.path]; // Add the selected image to the list
       });
     }
   }
 
   void _removeImage(String imagePath) {
     setState(() {
-      _boardImageList?.remove(imagePath); // Remove the selected image from the list
+      _boardImageList = _boardImageList?.where((image) => image != imagePath).toList(); // Remove the selected image from the list
     });
   }
 
@@ -132,11 +140,37 @@ class _EditPostState extends State<EditPost> {
                 ),
                 maxLines: 8,
               ),
+              SizedBox(height: 20), // Add some space between fields
+              TextField(
+                controller: _locationController, // Set the tradeLocation
+                decoration: InputDecoration(
+                  labelText: '거래 위치',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20), // Add some space between fields
+              TextField(
+                controller: _priceController, // Set the price
+                decoration: InputDecoration(
+                  labelText: '가격',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1),
+                  ),
+                ),
+              ),
               SizedBox(height: 10),
               _buildImageSection(),
               SizedBox(height: 10),
               ElevatedButton(
-                onPressed: _patchPost,
+                onPressed: _patchTrade,
                 child: Text('수정',),
                 style:ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.greenAccent)),
               ),

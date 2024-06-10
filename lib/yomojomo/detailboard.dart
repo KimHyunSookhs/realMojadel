@@ -510,8 +510,7 @@ class _DetailBoardState extends State<DetailBoard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  formatDatetime(
-                                      comments[index].writeDatetime ??
+                                  formatDatetime(comments[index].writeDatetime ??
                                           ''), // 작성 시간
                                   style: TextStyle(
                                       fontSize: 10, color: Colors.grey),

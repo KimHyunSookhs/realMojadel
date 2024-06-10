@@ -134,6 +134,7 @@ class _WriteBoardState extends State<WriteBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset:true,
       appBar: AppBar(
         title: Text('게시글 작성'),
         backgroundColor: AppColors.mintgreen,

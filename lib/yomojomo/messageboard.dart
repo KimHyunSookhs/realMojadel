@@ -6,8 +6,6 @@ import 'package:mojadel2/yomojomo/detailboard.dart';
 import 'package:mojadel2/yomojomo/writeboard.dart';
 import 'package:http/http.dart' as http;
 
-import 'Search/searchWord.dart';
-
 class BoardListItem {
   final int boardNumber;
   final String title;

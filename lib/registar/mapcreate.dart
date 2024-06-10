@@ -13,7 +13,7 @@ class MapCreateState extends State<MapCreate> {
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
   static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.637349311552, 126.83228024242),
+    target: LatLng(37.38075861289008, 126.9286181012336),
     zoom: 14.4746,
   );
 
@@ -51,7 +51,7 @@ class MapCreateState extends State<MapCreate> {
       _markers.add(
         Marker(
           markerId: MarkerId('id-1'),
-          position: LatLng(37.637349311552, 126.83228024242),
+          position: LatLng(37.38075861289008, 126.9286181012336),
           infoWindow: InfoWindow(
             title: '우리 동네',
             snippet: '거래 희망 장소!',
@@ -69,9 +69,7 @@ class MapCreateState extends State<MapCreate> {
           title: Text("장소명 입력"),
           content: TextField(
             onChanged: (value) {
-              setState(() {
-                _selectedPlaceName = value;
-              });
+              _selectedPlaceName = value;
             },
             decoration: InputDecoration(hintText: "장소명을 입력해주세요"),
           ),
