@@ -16,13 +16,13 @@ class TradeBoardListItem {
   final String title;
   final String content;
   final List<String> boardTitleImage;
-  final int favoriteCount; // 추가된 favoriteCount
-  final int commentCount; // 추가된 commentCount
-  final int viewCount; // 추가된 viewCount
-  final String writeDatetime; // 추가된 writeDatetime
+  final int favoriteCount;
+  final int commentCount;
+  final int viewCount;
+  final String writeDatetime;
   final String tradeLocation;
-  final String writerNickname;
   final String price;
+  final String writerNickname;
   final List<String> writerProfileImage;
 
   TradeBoardListItem(
@@ -35,9 +35,9 @@ class TradeBoardListItem {
       this.viewCount,
       this.writeDatetime,
       this.tradeLocation,
-      this.writerNickname,
       this.price,
-      this.writerProfileImage,
+      this.writerNickname,
+      this.writerProfileImage
       );
 }
 
@@ -53,6 +53,9 @@ class _MainhomePageState extends State<MainhomePage> {
   late StreamController<List<TradeBoardListItem>> _messageStreamController;
   bool _isMounted = false;
   String? _jwtToken;
+  bool _isSearching = false;
+  String? chatRoomId;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -79,14 +82,14 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade-board/latest-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
-        if (_isMounted && responseData['tradeBoardListItemList'] != null) {
-          if (responseData['tradeBoardListItemList'] is List) {
-            final List<dynamic> messageList = responseData['tradeBoardListItemList'];
+        if (_isMounted && responseData['tradelatestList'] != null) {
+          if (responseData['tradelatestList'] is List) {
+            final List<dynamic> messageList = responseData['tradelatestList'];
             List<TradeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
@@ -96,6 +99,13 @@ class _MainhomePageState extends State<MainhomePage> {
                   boardTitleImageList = [data['boardTitleImage']];
                 } else {
                   boardTitleImageList = List<String>.from(data['boardTitleImage']);
+                }
+              }
+              if (data['writerProfileImage'] != null) {
+                if (data['writerProfileImage'] is String) {
+                  writerProfileImage = [data['writerProfileImage']];
+                } else {
+                  writerProfileImage = List<String>.from(data['writerProfileImage']);
                 }
               }
               messages.add(
@@ -109,9 +119,9 @@ class _MainhomePageState extends State<MainhomePage> {
                   data['viewCount'] ?? 0,
                   data['writeDatetime'] ?? '',
                   data['tradeLocation']?? '',
-                  data['writerNickname'],
                   data['price']?? '',
-                  writerProfileImage,
+                  data['writerNickname'],
+                  writerProfileImage
                 ),
               );
             }
@@ -137,23 +147,110 @@ class _MainhomePageState extends State<MainhomePage> {
     }
   }
 
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void _stopSearch() {
+    setState(() {
+      _isSearching = false;
+      _searchController.clear();
+      fetchtradeBoard();
+    });
+  }
+
+  Future<void> _performSearch(String searchWord) async {
+    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    try {
+      http.Response response = await http.get(Uri.parse(uri), headers: {
+        'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
+      });
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
+        if (responseData['searchList'] != null) {
+          final List<dynamic> searchList = responseData['searchList'];
+          List<TradeBoardListItem> searchResults = [];
+          print('$responseData');
+          for (var data in searchList) {
+            List<String> boardTitleImageList = [];
+            List<String> writerProfileImage = [];
+            if (data['boardTitleImage'] != null) {
+              if (data['boardTitleImage'] is String) {
+                boardTitleImageList = [data['boardTitleImage']];
+              } else {
+                boardTitleImageList = List<String>.from(data['boardTitleImage']);
+              }
+            }
+            if (data['writerProfileImage'] != null) {
+              if (data['writerProfileImage'] is String) {
+                writerProfileImage = [data['writerProfileImage']];
+              } else {
+                writerProfileImage = List<String>.from(data['writerProfileImage']);
+              }
+            }
+            searchResults.add(
+              TradeBoardListItem(
+                data['boardNumber'],
+                data['title'],
+                data['content'],
+                boardTitleImageList,
+                data['favoriteCount'] ?? 0,
+                data['commentCount'] ?? 0,
+                data['viewCount'] ?? 0,
+                data['writeDatetime'] ?? '',
+                data['tradeLocation']?? '',
+                data['price']?? '',
+                data['writerNickname'],
+                writerProfileImage
+              ),
+            );
+          }
+          setState(() {
+            _messages = searchResults;
+          });
+          _messageStreamController.add(searchResults); // 스트림에 데이터 푸시
+        } else {
+          print('No search results found');
+        }
+      } else {
+        print('Failed to perform search: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Failed to perform search: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '화정동',
-          style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w300,
-              color: Colors.black),
-        ),
-        backgroundColor: AppColors.mintgreen,
-        actions: [
+        title: _isSearching
+            ? TextField(
+          controller: _searchController,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: '검색어를 입력하세요...',
+            border: InputBorder.none,
+          ),
+          onSubmitted: (value) {
+            _performSearch(value);
+          },
+        )
+            : Text('화정동'),
+        backgroundColor: AppColors.mintgreen, // Replace with AppColors.mintgreen if defined
+        actions: _isSearching
+            ? [
           IconButton(
-            onPressed: () {},
+            icon: Icon(Icons.clear),
+            onPressed: _stopSearch,
+          ),
+        ]
+            : [
+          IconButton(
             icon: Icon(Icons.search),
-            color: Colors.black,
+            onPressed: _startSearch,
           ),
           IconButton(
             onPressed: () {},
@@ -191,6 +288,8 @@ class _MainhomePageState extends State<MainhomePage> {
                         MaterialPageRoute(
                           builder: (context) => DetailPage(
                             tradeId: message.boardNumber,
+                            favoriteCount: message.favoriteCount,
+                            chatRoomId: chatRoomId ?? '',
                           ),
                         ),
                       );

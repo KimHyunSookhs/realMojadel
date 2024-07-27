@@ -46,7 +46,7 @@ class _WriteBoardState extends State<WriteBoard> {
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
     String content = _contentController.text;
-    final String uri = 'http://10.0.2.2:4000/api/v1/board';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ class _WriteBoardState extends State<WriteBoard> {
         Map<String, String> headers = {
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/board');
+        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/community/board');
         var request = http.MultipartRequest('POST', url)
           ..headers.addAll(headers)
           ..files.add(await http.MultipartFile.fromPath(

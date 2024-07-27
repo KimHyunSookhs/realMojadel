@@ -48,7 +48,7 @@ class _MyPageSiteState extends State<MyPageSite> {
   }
 
   Future<Map<String, dynamic>> _getUserInfo(String jwtToken) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/user/';
+    final String uri = 'http://10.0.2.2:4000/api/v1/user';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $jwtToken',
     };
@@ -64,7 +64,6 @@ class _MyPageSiteState extends State<MyPageSite> {
           'email': responseData['email'],
           'profileImage': responseData['profileImage'], // 수정된 키 사용
         };
-        print('${responseData}');
       } else {
         print('Failed to get user info: ${response.statusCode}');
         print('Response body: ${response.body}');

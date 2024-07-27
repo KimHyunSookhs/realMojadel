@@ -60,7 +60,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/board/${widget.postId}';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -116,9 +116,10 @@ class _DetailBoardState extends State<DetailBoard> {
       });
     }
   }
+
   Future<int?> _getFavoriteCountFromLatestList(
       int postId, String jwtToken) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/board/latest-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/latest-list';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $jwtToken',
     };
@@ -156,7 +157,7 @@ class _DetailBoardState extends State<DetailBoard> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://10.0.2.2:4000/api/v1/board/${widget.postId}/favorite';
+        'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail, // 사용자 이메일 추가
@@ -176,13 +177,11 @@ class _DetailBoardState extends State<DetailBoard> {
           isUpdatingFavorite = false;
         });
       } else {
-        print('Failed to update favorite count: ${response.statusCode}');
         setState(() {
           isUpdatingFavorite = false;
         });
       }
     } catch (error) {
-      print('Failed to update favorite count: $error');
       setState(() {
         isUpdatingFavorite = false;
       });
@@ -204,7 +203,7 @@ class _DetailBoardState extends State<DetailBoard> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://10.0.2.2:4000/api/v1/board/${widget.postId}/comment';
+        'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content, // Add the comment text
@@ -215,8 +214,7 @@ class _DetailBoardState extends State<DetailBoard> {
           'Authorization': 'Bearer $_jwtToken', // Add authorization header
           'Content-Type': 'application/json', // Specify JSON content type
         },
-        body: json
-            .encode(requestBody), // Include comment text in the request body
+        body: json.encode(requestBody), // Include comment text in the request body
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -232,7 +230,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchComments() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/board/${widget.postId}/comment-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -272,7 +270,7 @@ class _DetailBoardState extends State<DetailBoard> {
       return;
     }
     final String uri =
-        'http://10.0.2.2:4000/api/v1/board/$boardNumber/$commentNumber';
+        'http://10.0.2.2:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -286,16 +284,14 @@ class _DetailBoardState extends State<DetailBoard> {
           comments.removeWhere((comment) => comment.commentNumber == commentNumber); // Remove comment from list
         });
         fetchComments(); // Fetch comments again to update the UI
-      } else {
-        print('Failed to delete comment: ${response.statusCode}');
-        print('Response body: ${response.body}');
       }
     } catch (error) {
       print('Failed to delete comment: $error');
     }
   }
+
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/board/$boardNumber/$commentNumber';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent, // New content for the comment
@@ -510,8 +506,7 @@ class _DetailBoardState extends State<DetailBoard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  formatDatetime(comments[index].writeDatetime ??
-                                          ''), // 작성 시간
+                                  formatDatetime(comments[index].writeDatetime ?? ''), // 작성 시간
                                   style: TextStyle(
                                       fontSize: 10, color: Colors.grey),
                                 ),
