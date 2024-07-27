@@ -26,9 +26,6 @@ Future<void> postComment(int postId, String content, String jwtToken) async {
           CommentListItem comment = CommentListItem.fromJson(commentData);
           fetchedComments.add(comment);
         }
-        // setState(() {
-        //   comments = fetchedComments;
-        // });
       } else {
         print('Comments data is not in the expected format');
       }
@@ -47,9 +44,6 @@ Future<void> fetchComments(int postId, String jwtToken) async {
       'Authorization': 'Bearer $jwtToken',
     });
     if (response.statusCode == 200) {
-      // setState(() {
-      //   commentCount++; // Increment comment count
-      // });
       fetchComments(postId, jwtToken); // Fetch post details again to update the UI
     } else {
       print('Failed to post comment: ${response.statusCode}');

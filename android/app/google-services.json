@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "205196280951",
+    "project_id": "mojadel-baf28",
+    "storage_bucket": "mojadel-baf28.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205196280951:android:a666240dafe6de62a7b272",
+        "android_client_info": {
+          "package_name": "com.example.mojadel2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNufRNZTsBc4T3XeOw6CG-Dk0E00KrDEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

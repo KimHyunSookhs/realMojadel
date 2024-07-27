@@ -116,6 +116,7 @@ class _DetailBoardState extends State<DetailBoard> {
       });
     }
   }
+
   Future<int?> _getFavoriteCountFromLatestList(
       int postId, String jwtToken) async {
     final String uri = 'http://10.0.2.2:4000/api/v1/board/latest-list';
@@ -176,13 +177,11 @@ class _DetailBoardState extends State<DetailBoard> {
           isUpdatingFavorite = false;
         });
       } else {
-        print('Failed to update favorite count: ${response.statusCode}');
         setState(() {
           isUpdatingFavorite = false;
         });
       }
     } catch (error) {
-      print('Failed to update favorite count: $error');
       setState(() {
         isUpdatingFavorite = false;
       });
@@ -215,8 +214,7 @@ class _DetailBoardState extends State<DetailBoard> {
           'Authorization': 'Bearer $_jwtToken', // Add authorization header
           'Content-Type': 'application/json', // Specify JSON content type
         },
-        body: json
-            .encode(requestBody), // Include comment text in the request body
+        body: json.encode(requestBody), // Include comment text in the request body
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -286,14 +284,12 @@ class _DetailBoardState extends State<DetailBoard> {
           comments.removeWhere((comment) => comment.commentNumber == commentNumber); // Remove comment from list
         });
         fetchComments(); // Fetch comments again to update the UI
-      } else {
-        print('Failed to delete comment: ${response.statusCode}');
-        print('Response body: ${response.body}');
       }
     } catch (error) {
       print('Failed to delete comment: $error');
     }
   }
+
   Future<void> editComment(int commentNumber, String newContent) async {
     final String uri = 'http://10.0.2.2:4000/api/v1/board/$boardNumber/$commentNumber';
     try {
@@ -510,8 +506,7 @@ class _DetailBoardState extends State<DetailBoard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  formatDatetime(comments[index].writeDatetime ??
-                                          ''), // 작성 시간
+                                  formatDatetime(comments[index].writeDatetime ?? ''), // 작성 시간
                                   style: TextStyle(
                                       fontSize: 10, color: Colors.grey),
                                 ),

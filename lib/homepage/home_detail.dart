@@ -3,7 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:mojadel2/homepage/main_homepage.dart';
 import 'package:mojadel2/mypage/mypage.dart';
-
+import 'package:flutter/widgets.dart';
+import '../NearPlace/myArea.dart';
 import '../yomojomo/messageboard.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget> [
     MainhomePage(),
-    Text('내주변'),
+    ChatBoard(),
     MessageBoard(),
     Text('레시피'),
     MyPageSite(),
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             currentIndex: _selectedIndex,
             items:  <BottomNavigationBarItem>[
               BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-              BottomNavigationBarItem(icon: Icon(Icons.location_on_sharp), label: '내주변'),
+              BottomNavigationBarItem(icon: Icon(Icons.chat_rounded), label: '채팅방'),
               BottomNavigationBarItem(icon: Icon(Icons.chat_rounded), label: '요모조모'),
               BottomNavigationBarItem(icon: Icon(Icons.dinner_dining), label: '레시피'),
               BottomNavigationBarItem(
