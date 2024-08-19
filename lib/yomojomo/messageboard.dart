@@ -6,28 +6,7 @@ import 'package:mojadel2/yomojomo/detailboard.dart';
 import 'package:mojadel2/yomojomo/writeboard.dart';
 import 'package:http/http.dart' as http;
 
-class BoardListItem {
-  final int boardNumber;
-  final String title;
-  final String content;
-  final List<String> boardTitleImage;
-  final int favoriteCount; // 추가된 favoriteCount
-  final int commentCount; // 추가된 commentCount
-  final int viewCount; // 추가된 viewCount
-  final String writeDatetime; // 추가된 writeDatetime
-  final String writerNickname;
-  BoardListItem(
-      this.boardNumber,
-      this.title,
-      this.content,
-      this.boardTitleImage,
-      this.favoriteCount,
-      this.commentCount,
-      this.viewCount,
-      this.writeDatetime,
-      this.writerNickname,
-      );
-}
+import 'YomoJomoBoardList/BoardListItem.dart';
 
 class MessageBoard extends StatefulWidget {
   const MessageBoard({Key? key}) : super(key: key);

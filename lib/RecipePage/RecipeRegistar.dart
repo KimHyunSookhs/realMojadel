@@ -6,7 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:mojadel2/colors/colors.dart';
-import 'package:mojadel2/registar/mapcreate.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -14,40 +13,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
-class RegistarPage extends StatefulWidget {
+import '../Config/ImagePathProvider.dart';
+
+class RecipeRegistar extends StatefulWidget {
   @override
-  State<RegistarPage> createState() => _RegistarPageState();
+  State<RecipeRegistar> createState() => _RecipeRegistar();
 }
 
-class _RegistarPageState extends State<RegistarPage> {
+enum RecipeType  {Recipe, ConvRecipe}
+
+class _RecipeRegistar extends State<RecipeRegistar> {
   XFile? _image;
   ImagePicker picker = ImagePicker();
   List<String> _boardImageList = [];
-  String _selectedPlaceName = '';
   String? _userEmail; // 로그인한 사용자의 이메일
   String? _jwtToken;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-
+  RecipeType? _recipeType = RecipeType.Recipe;
+  int? type;
   @override
   void initState() {
     super.initState();
-    _loadUserEmail();
-    _loadToken();
+    loadUserInfo();
   }
 
-  Future<void> _loadUserEmail() async {
+  Future<void> loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _userEmail = prefs.getString('userEmail');
-    });
-  }
-
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
       _jwtToken = prefs.getString('jwtToken');
     });
   }
@@ -55,9 +49,8 @@ class _RegistarPageState extends State<RegistarPage> {
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
     String content = _contentController.text;
-    String tradeLocation = _locationController.text;
-    String price = _priceController.text;
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board';
+    type = _recipeType == RecipeType.Recipe ? 0 : 1 ;
+    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -67,8 +60,7 @@ class _RegistarPageState extends State<RegistarPage> {
       'title': title,
       'content': content,
       'boardImageList': _boardImageList,
-      'tradeLocation' : tradeLocation,
-      'price' : price,
+      'type' : type,
     };
     String requestBody = json.encode(postData);
     try {
@@ -78,7 +70,6 @@ class _RegistarPageState extends State<RegistarPage> {
         body: requestBody,
       );
       if (response.statusCode == 200) {
-        print('The tradepost has been successfully submitted.');
         Navigator.of(context).pop(true);
       } else {
         print('Failed to submit the post. Error code: ${response.statusCode}');
@@ -96,14 +87,12 @@ class _RegistarPageState extends State<RegistarPage> {
         Map<String, String> headers = {
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/board');
+        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/recipe');
         var request = http.MultipartRequest('POST', url)
           ..headers.addAll(headers)
           ..files.add(await http.MultipartFile.fromPath(
-            'image',
-            imageFile.path,
-            contentType:
-            MediaType('image', 'jpeg'), // Update with the actual type
+            'image', imageFile.path,
+            contentType:MediaType('image', 'jpeg'), // Update with the actual type
           ));
         request.headers['Content-Type'] = 'multipart/form-data;charset=UTF-8';
         var streamedResponse = await request.send();
@@ -113,7 +102,6 @@ class _RegistarPageState extends State<RegistarPage> {
           return imageUrl;
         } else {
           print('이미지 업로드 실패. 오류 코드: ${response.statusCode}');
-          print('응답 내용: ${response.body}');
           return null;
         }
       } catch (e) {
@@ -125,33 +113,42 @@ class _RegistarPageState extends State<RegistarPage> {
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      String imagePath = await _saveImagePermanently(File(pickedFile.path));
+      String imagePath = await saveImagePermanently(File(pickedFile.path));
       setState(() {
         _boardImageList.add(imagePath);
         _image = pickedFile;
       });
     }
   }
-  Future<String> _saveImagePermanently(File imageFile) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final String path = directory.path;
-    final String fileName = basename(imageFile.path);
-    final File permanentFile = await imageFile.copy('$path/$fileName');
-    return '$path/$fileName';
-  }
 
   Widget _buildPhotoArea() {
-    return _image != null
-        ? Container(
-      width: 140,
-      height: 120,
-      child: Image.file(File(_image!.path)),
-    )
-        : Container(
-      width: 140,
-      height: 120,
-      color: Colors.white38,
-      child: Icon(Icons.photo, size: 50, color: Colors.grey), // Placeholder icon
+    return GestureDetector(
+      onTap: () {
+        getImage(ImageSource.gallery);
+      },
+      child: Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: _image != null
+            ? Image.file(File(_image!.path), fit: BoxFit.fill)
+            : Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.photo, size: 50, color: Colors.grey),
+              SizedBox(height: 10), // 간격을 추가
+              Text(
+                "대표 이미지를 추가해주세요",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ), // Placeholder icon과 텍스트 추가
+      ),
     );
   }
   @override
@@ -162,7 +159,7 @@ class _RegistarPageState extends State<RegistarPage> {
           appBar: AppBar(
             backgroundColor: AppColors.mintgreen,
             title: Text(
-              '제품 등록',
+              '레시피 등록',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontFamily: 'Inter',
                 color: Colors.black,
@@ -180,9 +177,9 @@ class _RegistarPageState extends State<RegistarPage> {
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(10, 20, 0, 0),
                     child: Text(
-                      '제목',
+                      '레시피 제목',
                       textAlign: TextAlign.start,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w500,
                       ),
@@ -198,7 +195,7 @@ class _RegistarPageState extends State<RegistarPage> {
                       autofocus: false,
                       obscureText: false,
                       decoration: InputDecoration(
-                        hintText: '제목을 입력하세요',
+                        hintText: '예) 제육볶음 만들기',
                         hintStyle: TextStyle(color: Colors.grey),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -218,61 +215,15 @@ class _RegistarPageState extends State<RegistarPage> {
                       minLines: 1,
                     ),
                   ),
-                  Align(
-                    alignment: AlignmentDirectional(0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        FloatingActionButton(
-                          heroTag: 'gallery_button',
-                          onPressed: () {
-                            getImage(ImageSource.gallery);
-                          },
-                          child: Icon(Icons.photo),
-                        ),
-                        SizedBox(
-                          height: 10,
-                          width: 10,
-                        ),
-                        _buildPhotoArea(),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20,),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
-                    child: TextField(
-                      autofocus: false,
-                      obscureText: false,
-                      controller: _priceController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        labelStyle: Theme.of(context).textTheme.labelMedium,
-                        hintText: '가격을 입력해주세요',
-                        hintStyle: Theme.of(context).textTheme.labelMedium,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: _buildPhotoArea(),
                   ),
+                  SizedBox(height: 5,),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 20, 0, 0),
+                    padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0),
                     child: Text(
-                      '제품 설명',
+                      '레시피 설명',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
@@ -287,7 +238,7 @@ class _RegistarPageState extends State<RegistarPage> {
                       },
                       decoration: InputDecoration(
                         labelStyle: Theme.of(context).textTheme.labelMedium,
-                        hintText: '제품의 상세한 설명을 적어주세요.',
+                        hintText: '레시피의 간략한 설명을 적어주세요.',
                         hintStyle:
                         Theme.of(context).textTheme.labelMedium?.copyWith(
                           fontFamily: 'Readex Pro',
@@ -309,57 +260,49 @@ class _RegistarPageState extends State<RegistarPage> {
                         ),
                       ),
                       style: Theme.of(context).textTheme.bodyMedium,
-                      maxLines: 6,
+                      maxLines: 3,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0),
-                    child: Text('거래 희망 장소', style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16)),),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    child: FloatingActionButton(
-                      heroTag: 'map_button',
-                      onPressed: () async {
-                        final selectedPlaceName = await Navigator.push<String>(
-                          context,
-                          MaterialPageRoute(builder: (context) => MapCreate()),
-                        );
-                        // Navigator.pop()에서 전달받은 장소명을 설정합니다.
-                        if (selectedPlaceName != null) {
-                          setState(() {
-                            _selectedPlaceName = selectedPlaceName;
-                            _locationController.text = _selectedPlaceName;
-                          });
-                        }
-                      },
-                      tooltip: '위치지정',
-                      child: Icon(Icons.location_searching),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 3, 10, 0),
-                    child: TextField(
-                      controller: _locationController,
-                      decoration: InputDecoration(
-                        labelStyle: Theme.of(context).textTheme.labelMedium,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start, // 좌측 정렬
+                      children: <Widget>[
+                        Text('카테고리', style: Theme.of(context).textTheme.bodyMedium,),
+                        Row(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Radio<RecipeType>(
+                                  value: RecipeType.Recipe,
+                                  groupValue: _recipeType,
+                                  onChanged: (RecipeType? value) {
+                                    setState(() {
+                                      _recipeType = value;
+                                    });
+                                  },
+                                ),
+                                const Text('일반레시피'),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Radio<RecipeType>(
+                                  value: RecipeType.ConvRecipe,
+                                  groupValue: _recipeType,
+                                  onChanged: (RecipeType? value) {
+                                    setState(() {
+                                      _recipeType = value;
+                                    });
+                                  },
+                                ),
+                                const Text('편의점레시피'),
+                              ],
+                            ),
+                          ],
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                   Padding(

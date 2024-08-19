@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mojadel2/registar/registar_page.dart';
+
 
 class MapCreate extends StatefulWidget {
   @override

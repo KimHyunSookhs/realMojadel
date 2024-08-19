@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mojadel2/colors/colors.dart';
-import '../homepage/ChattingPage.dart';
+import 'ChattingPage.dart';
 
 class ChatBoardPage extends StatefulWidget {
   final String sellerNickname;

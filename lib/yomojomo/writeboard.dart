@@ -7,7 +7,7 @@ import 'package:mojadel2/colors/colors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:path/path.dart';
+import '../Config/ImagePathProvider.dart';
 
 class WriteBoard extends StatefulWidget {
   @override
@@ -25,20 +25,13 @@ class _WriteBoardState extends State<WriteBoard> {
   @override
   void initState() {
     super.initState();
-    _loadUserEmail(); // 사용자 이메일 불러오기
-    _loadToken();
+    loadUserInfo();
   }
 
-  Future<void> _loadUserEmail() async {
+  Future<void> loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _userEmail = prefs.getString('userEmail');
-    });
-  }
-
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
       _jwtToken = prefs.getString('jwtToken');
     });
   }
@@ -116,19 +109,11 @@ class _WriteBoardState extends State<WriteBoard> {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
       // Save the image file path permanently and add it to the boardImageList
-      String imagePath = await _saveImagePermanently(File(pickedFile.path));
+      String imagePath = await saveImagePermanently(File(pickedFile.path));
       setState(() {
         _boardImageList.add(imagePath);
       });
     }
-  }
-
-  Future<String> _saveImagePermanently(File imageFile) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final String path = directory.path;
-    final String fileName = basename(imageFile.path);
-    final File permanentFile = await imageFile.copy('$path/$fileName');
-    return '$path/$fileName'; // Return the file path
   }
 
   @override

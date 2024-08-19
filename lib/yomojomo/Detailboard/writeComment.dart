@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../Comment/commentList.dart';
+import 'package:mojadel2/Comment/commentList.dart';
 
 Future<void> postComment(int postId, String content, String jwtToken) async {
   final String uri = 'http://10.0.2.2:4000/api/v1/community/board/$postId/comment';

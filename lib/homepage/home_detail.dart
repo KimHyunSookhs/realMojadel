@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mojadel2/RecipePage/RecipePage.dart';
 import 'package:mojadel2/colors/colors.dart';
-import 'package:mojadel2/homepage/main_homepage.dart';
+import 'package:mojadel2/TradePage/TradePage.dart';
 import 'package:mojadel2/mypage/mypage.dart';
 import 'package:flutter/widgets.dart';
-import '../NearPlace/ChatBoard.dart';
+import '../TradePage/ChatBoard/ChatBoard.dart';
 import '../yomojomo/messageboard.dart';
-import 'package:cupertino_icons/cupertino_icons.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     MainhomePage(),
     ChatBoardPage(sellerNickname: '현수',),
     MessageBoard(),
-    Text('레시피'),
+    RecipePage(),
     MyPageSite(),
   ];
 
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.shifting,
             backgroundColor: Colors.white,
-            selectedItemColor: AppColors.mintgreen,
+            selectedItemColor: Colors.black,
             unselectedItemColor: Colors.grey,
             currentIndex: _selectedIndex,
             items:  <BottomNavigationBarItem>[

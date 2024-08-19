@@ -2,13 +2,15 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mojadel2/yomojomo/Comment/commentList.dart';
-import 'package:mojadel2/yomojomo/Detailboard/getUserInfo.dart';
+import 'package:mojadel2/Comment/commentList.dart';
+import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../Config/ParseBoardImage.dart';
+import '../Favorite/FavoriteListItem.dart';
 import '../colors/colors.dart';
 import '../yomojomo/Detailboard/showWriteTime.dart';
-import 'ChattingPage.dart';
+import 'ChatBoard/ChattingPage.dart';
 import 'EditTrade.dart';
 
 class DetailPage extends StatefulWidget {
@@ -45,7 +47,8 @@ class _DetailPageState extends State<DetailPage> {
   int _currentImageIndex=0;
   int? commentNumber;
   int commentCount = 0; // Added commentCount
-  List<CommentListItem> comments = []; // List to store comments
+  List<CommentListItem> comments = [];
+  List<FavoriteListItem> favorites = [];
   String chatRoomId = '';
 
   @override
@@ -54,7 +57,7 @@ class _DetailPageState extends State<DetailPage> {
     _loadUserInfo().then((_) {
       fetchTradeDetail();
       fetchComments();
-      _loadFavoriteCount();
+      fetchFavorits();
     });
   }
 
@@ -103,19 +106,6 @@ class _DetailPageState extends State<DetailPage> {
         _userEmail = userInfo['email'];
         _profileImageUrl = userInfo['profileImage'];
       });
-    }
-  }
-
-  List<String> parseBoardImageList(String jsonString) {
-    try {
-      if (jsonString.isEmpty) {
-        return []; // Return an empty list if the string is empty
-      }
-      List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList.cast<String>();
-    } catch (e) {
-      print('Error parsing boardImageList: $e');
-      return [];
     }
   }
 
@@ -205,7 +195,6 @@ class _DetailPageState extends State<DetailPage> {
       print('Failed to post comment: $error');
     }
   }
-
   Future<void> fetchComments() async {
     final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/${widget.tradeId}/comment-list';
     try {
@@ -254,7 +243,6 @@ class _DetailPageState extends State<DetailPage> {
       }
     } catch (error) {}
   }
-
   Future<void> editComment(int commentNumber, String newContent) async {
     final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
@@ -280,48 +268,6 @@ class _DetailPageState extends State<DetailPage> {
       print('Failed to edit comment: $error');
     }
   }
-  Future<void> _loadFavoriteCount() async {
-    if (_jwtToken != null) {
-      final count = await _getFavoriteCountFromLatestList(widget.tradeId, _jwtToken!);
-      setState(() {
-        favoriteCount = count ?? 0;
-      });
-    }
-  }
-  Future<int?> _getFavoriteCountFromLatestList(
-      int tradeId, String jwtToken) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/latest-list';
-    final Map<String, String> headers = {
-      'Authorization': 'Bearer $jwtToken',
-    };
-    try {
-      final response = await http.get(
-        Uri.parse(uri),
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        final responseData = json.decode(utf8.decode(response.bodyBytes));
-        final List<dynamic> latestList = responseData['tradelatestList'];
-        final post = latestList.firstWhere(
-           (item) => item['boardNumber'] == tradeId,
-           orElse: () => null);
-        if (post != null) {
-          final int favoriteCount = post['favoriteCount'] ?? 0;
-          final bool isFavorite = post['isFavorite'] ?? false;
-          setState(() {
-            this.isFavorite = isFavorite;
-          });
-          return favoriteCount;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    } catch (error) {
-      return null;
-    }
-  }
 
   Future<void> toggleFavorite() async {
     if (isUpdatingFavorite) return; // 이미 업데이트 중이면 아무 작업도 하지 않음
@@ -337,17 +283,17 @@ class _DetailPageState extends State<DetailPage> {
       http.Response response = await http.put(
         Uri.parse(uri),
         headers: {
-          'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
-          'Content-Type': 'application/json', // JSON 타입 명시
+          'Authorization': 'Bearer $_jwtToken',
+          'Content-Type': 'application/json',
         },
-        body: json.encode(requestBody), // 요청 본문에 이메일 포함
+        body: json.encode(requestBody),
       );
       if (response.statusCode == 200) {
-        await _loadFavoriteCount(); // 좋아요 카운트를 다시 불러옴
         setState(() {
           isFavorite = !isFavorite;
           isUpdatingFavorite = false;
         });
+        await fetchFavorits();
       } else {
         setState(() {
           isUpdatingFavorite = false;
@@ -357,6 +303,36 @@ class _DetailPageState extends State<DetailPage> {
       setState(() {
         isUpdatingFavorite = false;
       });
+    }
+  }
+  Future<void> fetchFavorits() async {
+    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite-list';
+    try {
+      http.Response response = await http.get(Uri.parse(uri), headers: {
+        'Authorization': 'Bearer $_jwtToken',
+      });
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData =
+        json.decode(utf8.decode(response.bodyBytes));
+        if (responseData['favoriteList'] != null &&
+            responseData['favoriteList'] is List) {
+          List<FavoriteListItem> fetchFavorits = [];
+          for (var favoriteData in responseData['favoriteList']) {
+            FavoriteListItem favorite = FavoriteListItem.fromJson(favoriteData);
+            fetchFavorits.add(favorite);
+          }
+          setState(() {
+            favorites = fetchFavorits;
+            favoriteCount = favorites.length;
+          });
+        } else {
+          print('Comments data is not in the expected format');
+        }
+      } else {
+        print('Failed to fetch comments: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Failed to fetch comments: $error');
     }
   }
 

@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:mojadel2/colors/colors.dart';
-
-import '../../config/user_model.dart';
+import '../../Config/UserModel.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

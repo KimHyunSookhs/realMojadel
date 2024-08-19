@@ -1,49 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mojadel2/homepage/DetailPage.dart';
-import 'package:mojadel2/registar/registar_page.dart';
+import 'package:mojadel2/TradePage/DetailPage.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:mojadel2/TradePage/registar/registar_page.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'dart:convert'; // For JSON decoding
 import 'package:http/http.dart' as http; // For HTTP requests
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-
-class TradeBoardListItem {
-  final int boardNumber;
-  final String title;
-  final String content;
-  final List<String> boardTitleImage;
-  final int favoriteCount;
-  final int commentCount;
-  final int viewCount;
-  final String writeDatetime;
-  final String tradeLocation;
-  final String price;
-  final String writerNickname;
-  final List<String> writerProfileImage;
-
-  TradeBoardListItem(
-      this.boardNumber,
-      this.title,
-      this.content,
-      this.boardTitleImage,
-      this.favoriteCount,
-      this.commentCount,
-      this.viewCount,
-      this.writeDatetime,
-      this.tradeLocation,
-      this.price,
-      this.writerNickname,
-      this.writerProfileImage
-      );
-}
+import 'TradeBoardList/TradeBoardListItem.dart';
 
 class MainhomePage extends StatefulWidget {
   const MainhomePage({Key? key}) : super(key: key);
-
   @override
   State<MainhomePage> createState() => _MainhomePageState();
 }
@@ -172,7 +140,6 @@ class _MainhomePageState extends State<MainhomePage> {
         if (responseData['searchList'] != null) {
           final List<dynamic> searchList = responseData['searchList'];
           List<TradeBoardListItem> searchResults = [];
-          print('$responseData');
           for (var data in searchList) {
             List<String> boardTitleImageList = [];
             List<String> writerProfileImage = [];
