@@ -35,20 +35,13 @@ class _RegistarPageState extends State<RegistarPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserEmail();
-    _loadToken();
+    loadUserInfo();
   }
 
-  Future<void> _loadUserEmail() async {
+  Future<void> loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _userEmail = prefs.getString('userEmail');
-    });
-  }
-
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
       _jwtToken = prefs.getString('jwtToken');
     });
   }
@@ -86,41 +79,6 @@ class _RegistarPageState extends State<RegistarPage> {
       }
     } catch (error) {
       print('An error occurred while submitting the post: $error');
-    }
-  }
-
-  Future<String?> _uploadImage(File imageFile) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jwtToken = prefs.getString('jwtToken');
-    if (jwtToken != null) {
-      try {
-        Map<String, String> headers = {
-          'Authorization': 'Bearer $jwtToken',
-        };
-        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/board');
-        var request = http.MultipartRequest('POST', url)
-          ..headers.addAll(headers)
-          ..files.add(await http.MultipartFile.fromPath(
-            'image',
-            imageFile.path,
-            contentType:
-            MediaType('image', 'jpeg'), // Update with the actual type
-          ));
-        request.headers['Content-Type'] = 'multipart/form-data;charset=UTF-8';
-        var streamedResponse = await request.send();
-        var response = await http.Response.fromStream(streamedResponse);
-        if (response.statusCode == 200) {
-          final imageUrl = jsonDecode(response.body)['imageUrl'];
-          return imageUrl;
-        } else {
-          print('이미지 업로드 실패. 오류 코드: ${response.statusCode}');
-          print('응답 내용: ${response.body}');
-          return null;
-        }
-      } catch (e) {
-        print('이미지 업로드 중 오류 발생: $e');
-        return null;
-      }
     }
   }
 

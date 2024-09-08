@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mojadel2/Config/ImagePathProvider.dart';
+import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:mojadel2/mypage/signup/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +16,6 @@ import 'package:path/path.dart';
 
 class MyPageSite extends StatefulWidget {
   const MyPageSite({Key? key}) : super(key: key);
-
   @override
   State<MyPageSite> createState() => _MyPageSiteState();
 }
@@ -36,67 +37,14 @@ class _MyPageSiteState extends State<MyPageSite> {
 
   Future<void> _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
-    _jwtToken = prefs.getString('jwtToken'); // jwtToken 가져오기
+    _jwtToken = prefs.getString('jwtToken');
     if (_jwtToken != null) {
-      final userInfo = await _getUserInfo(_jwtToken!);
+      final userInfo = await UserInfoService.getUserInfo(_jwtToken!);
       setState(() {
         _nickname = userInfo['nickname'];
         _userEmail = userInfo['email'];
         _profileImageUrl = userInfo['profileImage'];
       });
-    }
-  }
-
-  Future<Map<String, dynamic>> _getUserInfo(String jwtToken) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/user';
-    final Map<String, String> headers = {
-      'Authorization': 'Bearer $jwtToken',
-    };
-    try {
-      final response = await http.get(
-        Uri.parse(uri),
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
-        return {
-          'nickname': responseData['nickname'],
-          'email': responseData['email'],
-          'profileImage': responseData['profileImage'], // 수정된 키 사용
-        };
-      } else {
-        print('Failed to get user info: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        return {};
-      }
-    } catch (error) {
-      print('Failed to get user info: $error');
-      return {};
-    }
-  }
-
-  Future<String?> _getNickname(String jwtToken) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/user'; // 사용자 정보를 가져오는 API 엔드포인트
-    final Map<String, String> headers = {
-      'Authorization': 'Bearer $jwtToken', // JWT 토큰을 인증 헤더에 포함
-    };
-    try {
-      final response = await http.get(
-        Uri.parse(uri),
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
-        final String? nickname = responseData['nickname'];
-        return nickname;
-      } else {
-        print('Failed to get nickname: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        return null;
-      }
-    } catch (error) {
-      print('Failed to get nickname: $error');
-      return null;
     }
   }
 
@@ -131,11 +79,8 @@ class _MyPageSiteState extends State<MyPageSite> {
             _imageFile = imageFile;
             _profileImageUrl = imageUrl;
           });
-          print('Image uploaded successfully');
-          print('Image imageFile: $imageFile');
         } else {
           print('Failed to upload image: ${response.statusCode}');
-          print('Response body: ${response.body}');
         }
       } catch (e) {
         print('Failed to upload image: $e');
@@ -143,30 +88,16 @@ class _MyPageSiteState extends State<MyPageSite> {
     }
   }
 
-  Future<void> _getImage(ImageSource imageSource) async {
+  Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      final File permanentFile = await _saveImagePermanently(imageFile);
-      if (permanentFile.existsSync()) { // 파일이 존재하는지 확인
-        setState(() {
-          _imageFile = permanentFile; // 변경된 이미지를 상태에 저장
-        });
-        await _uploadImage(permanentFile);
-      } else {
-        print('파일이 존재하지 않습니다.');
-      }
-    } else {
-      print('이미지를 선택하지 않았습니다.');
+      String imagePath = await saveImagePermanently(File(pickedFile.path));
+      setState(() {
+        _imageFile = File(imagePath);  // 프로필 이미지 파일 설정
+        _profileImageUrl = imagePath;  // 프로필 이미지 URL 설정
+      });
+        _uploadImage(File(imagePath));  // 이미지 업로드
     }
-  }
-
-  Future<File> _saveImagePermanently(File imageFile) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final String path = directory.path;
-    final String fileName = basename(imageFile.path);
-    final File permanentFile = await imageFile.copy('$path/$fileName');
-    return permanentFile;
   }
 
   @override
@@ -254,7 +185,7 @@ class _MyPageSiteState extends State<MyPageSite> {
             Divider(),
             TextButton(
               onPressed: () {
-                _getImage(ImageSource.gallery);
+                getImage(ImageSource.gallery);
               },
               child: Text('프로필 사진 변경'),
             ),

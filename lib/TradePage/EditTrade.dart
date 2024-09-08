@@ -12,7 +12,7 @@ class EditTradePage extends StatefulWidget {
   final String initialContent;
   final List<String>? boardImageList;
   final String initialLocation;
-  final String initialPrice; // New field for initial price
+  final String initialPrice;
   const EditTradePage({
     Key? key,
     required this.tradeId,

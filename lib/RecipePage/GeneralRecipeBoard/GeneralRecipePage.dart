@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:mojadel2/RecipePage/DetailRecipePage.dart';
 import 'package:mojadel2/RecipePage/RecipeBoardList/RecipeBoardListItem.dart';
 import 'package:mojadel2/RecipePage/RecipeRegistar.dart';
 import 'package:mojadel2/colors/colors.dart';
@@ -17,8 +18,8 @@ class GeneralRecipePage extends StatefulWidget {
 }
 
 class _GeneralRecipePageState extends State<GeneralRecipePage> {
-  List<RecipeBoardItem> _messages = [];
-  late StreamController<List<RecipeBoardItem>> _messageStreamController;
+  List<RecipeBoardListItem> _messages = [];
+  late StreamController<List<RecipeBoardListItem>> _messageStreamController;
   bool _isMounted = false;
   String? _jwtToken;
 
@@ -26,7 +27,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
   void initState() {
     super.initState();
     _isMounted = true;
-    _messageStreamController = StreamController<List<RecipeBoardItem>>();
+    _messageStreamController = StreamController<List<RecipeBoardListItem>>();
     fetchRecipeBoard();
   }
 
@@ -46,10 +47,18 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
         if (_isMounted && responseData['recipelatestList'] != null) {
           if (responseData['recipelatestList'] is List) {
             final List<dynamic> messageList = responseData['recipelatestList'];
-            List<RecipeBoardItem> messages = [];
+            List<RecipeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
               List<String> writerProfileImage = [];
+              List<String> step1_image = [];
+              List<String> step2_image = [];
+              List<String> step3_image = [];
+              List<String> step4_image = [];
+              List<String> step5_image= [];
+              List<String> step6_image = [];
+              List<String> step7_image = [];
+              List<String> step8_image = [];
               if (data['boardTitleImage'] != null) {
                 if (data['boardTitleImage'] is String) {
                   boardTitleImageList = [data['boardTitleImage']];
@@ -65,17 +74,35 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                 }
               }
               messages.add(
-                RecipeBoardItem(
-                    data['boardNumber'],
-                    data['title'],
-                    data['content'],
-                    boardTitleImageList,
-                    data['favoriteCount'] ?? 0,
-                    data['commentCount'] ?? 0,
-                    data['viewCount'] ?? 0,
-                    data['writeDatetime'] ?? '',
-                    data['writerNickname'],
-                    writerProfileImage
+                RecipeBoardListItem(
+                  boardNumber: data['boardNumber'],
+                  title: data['title'],
+                  content: data['content'],
+                  boardTitleImage: boardTitleImageList,
+                  favoriteCount: data['favoriteCount'] ?? 0,
+                  commentCount: data['commentCount'] ?? 0,
+                  viewCount: data['viewCount'] ?? 0,
+                  writeDatetime: data['writeDatetime'] ?? '',
+                  writerNickname: data['writerNickname'],
+                  writerProfileImage: writerProfileImage,
+                  type: data['type'],
+                  cookingTime: data['cookingTime'],
+                  step1_content: data['step1_content']??'',
+                  step2_content: data['step2_content']??'',
+                  step3_content: data['step3_content']??'',
+                  step4_content: data['step4_content']??'',
+                  step5_content: data['step5_content']??'',
+                  step6_content: data['step6_content']??'',
+                  step7_content: data['step7_content']??'',
+                  step8_content: data['step8_content']??'',
+                  step1_image: data['step1_image']??'',
+                  step2_image: data['step2_image']??'',
+                  step3_image: data['step3_image']??'',
+                  step4_image: data['step4_image']??'',
+                  step5_image: data['step5_image']??'',
+                  step6_image: data['step6_image']??'',
+                  step7_image: data['step7_image']??'',
+                  step8_image: data['step8_image']??'',
                 ),
               );
             }
@@ -85,11 +112,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                 _messageStreamController.add(messages);
               });
             }
-          } else {
-            print('recipelatestList is not a list');
           }
-        } else {
-          print('recipelatestList is null');
         }
       } else {
         print('Failed to fetch messages: ${response.statusCode}');
@@ -116,15 +139,11 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: StreamBuilder<List<RecipeBoardItem>>(
+        child: StreamBuilder<List<RecipeBoardListItem>>(
           stream: _messageStreamController.stream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting && _messages.isEmpty) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('게시글이 없습니다.'));
+              return  Center(child: Text('게시글이 없습니다.'));
             } else {
               final messages = snapshot.data ?? [];
               return GridView.builder(
@@ -138,7 +157,14 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                   final message = messages[index];
                   return GestureDetector(
                     onTap: () async {
-                      // Handle item tap, e.g., navigate to detail page
+                      final success = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailRecipePage(
+                            recipeId: message.boardNumber,
+                          ),
+                        ),
+                      );
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +183,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                         SizedBox(height: 5),
                         Text(
                           message.title,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

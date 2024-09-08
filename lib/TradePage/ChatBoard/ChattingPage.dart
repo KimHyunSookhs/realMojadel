@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mojadel2/Config/ParseBoardImage.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,27 +62,17 @@ class _ChattingPageState extends State<ChattingPage> {
     }
   }
 
-  List<String> parseBoardImageList(String jsonString) {
-    try {
-      if (jsonString.isEmpty) {
-        print('Board image list is empty');
-        return [];
-      }
-      List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList.cast<String>();
-    } catch (e) {
-      print('Error parsing boardImageList: $e');
-      return [];
-    }
-  }
-
   Future<void> createOrJoinChatRoom() async {
     if (currentUserNickname == null) {
       print('Current user nickname is null');
       return;
     }
 
-    String chatRoomId = widget.title + currentUserNickname!;
+    // 고유한 chatRoomId 생성
+    List<String> participants = [widget.writerNickname, currentUserNickname!];
+    participants.sort(); // 알파벳 순으로 정렬하여 동일한 ID 생성 보장
+    String chatRoomId = widget.title + "_" + participants.join("_");
+
     try {
       DocumentReference chatRoomRef = FirebaseFirestore.instance.collection('chatRooms').doc(chatRoomId);
       DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
@@ -94,13 +85,10 @@ class _ChattingPageState extends State<ChattingPage> {
           'price': widget.price,
           'boardImageList': widget.boardImageList,
           'participants': {
-            'buyer': currentUserNickname,
-            'seller': widget.writerNickname,
+            'buyer': isSeller ? widget.writerNickname : currentUserNickname,
+            'seller': isSeller ? currentUserNickname : widget.writerNickname,
           }
         });
-      } else if (isSeller) {
-        // If the current user is the seller, find the chat room where they are the seller
-        chatRoomId = chatRoomSnapshot.id;
       }
 
       setState(() {
@@ -110,6 +98,7 @@ class _ChattingPageState extends State<ChattingPage> {
       print('Failed to create or retrieve chat room: $e');
     }
   }
+
 
   String formatTimestamp(Timestamp timestamp) {
     DateTime date = timestamp.toDate().toLocal().add(Duration(hours: 9)); // UTC+9

@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mojadel2/Comment/commentList.dart';
+import 'package:mojadel2/Config/ConfirmDelete.dart';
 import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -46,7 +47,7 @@ class _DetailPageState extends State<DetailPage> {
   TextEditingController _commentController = TextEditingController();
   int _currentImageIndex=0;
   int? commentNumber;
-  int commentCount = 0; // Added commentCount
+  int commentCount = 0;
   List<CommentListItem> comments = [];
   List<FavoriteListItem> favorites = [];
   String chatRoomId = '';
@@ -109,41 +110,20 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Future<void> confirmDelete() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('게시글 삭제'),
-            content: Text('정말로 이 게시글을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                child: Text('취소'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('삭제'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  deleteTradeBoard();
-                },),],);});}
-
   Future<void> deleteTradeBoard() async {
     final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
         headers: {
-          'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
+          'Authorization': 'Bearer $_jwtToken',
         },
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('게시글이 삭제되었습니다.')),
         );
-        Navigator.pop(context, true); // 게시글 목록으로 돌아가기
+        Navigator.pop(context, true);
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -253,16 +233,15 @@ class _DetailPageState extends State<DetailPage> {
       http.Response response = await http.patch(
         Uri.parse(uri),
         headers: {
-          'Authorization': 'Bearer $_jwtToken', // Add authorization header
-          'Content-Type': 'application/json', // Specify JSON content type
+          'Authorization': 'Bearer $_jwtToken',
+          'Content-Type': 'application/json',
         },
-        body: json.encode(requestBody), // Include new content in the request body
+        body: json.encode(requestBody),
       );
       if (response.statusCode == 200) {
-        fetchComments(); // Fetch comments again to update the UI
+        fetchComments();
       } else {
         print('Failed to edit comment: ${response.statusCode}');
-        print('Response body: ${response.body}');
       }
     } catch (error) {
       print('Failed to edit comment: $error');
@@ -360,7 +339,13 @@ class _DetailPageState extends State<DetailPage> {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              confirmDelete();
+              showDialog(context: context,
+                  builder: (BuildContext context){
+                    return ConfirmDelete(
+                        title: '게시글 삭제',
+                        content: '정말로 이 게시글을 삭제하시겠습니까?',
+                        onDelete: deleteTradeBoard);
+                  });
             },
           ),
         ],

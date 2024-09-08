@@ -45,7 +45,7 @@ class _MainhomePageState extends State<MainhomePage> {
       DateTime parsedDatetime = DateTime.parse(datetime).toUtc();
       return DateFormat('MM/dd').format(parsedDatetime);
     } else {
-      return ''; // Return empty string if datetime is null or empty
+      return '';
     }
   }
 
@@ -177,7 +177,7 @@ class _MainhomePageState extends State<MainhomePage> {
           setState(() {
             _messages = searchResults;
           });
-          _messageStreamController.add(searchResults); // 스트림에 데이터 푸시
+          _messageStreamController.add(searchResults);
         } else {
           print('No search results found');
         }
@@ -206,7 +206,7 @@ class _MainhomePageState extends State<MainhomePage> {
           },
         )
             : Text('화정동'),
-        backgroundColor: AppColors.mintgreen, // Replace with AppColors.mintgreen if defined
+        backgroundColor: AppColors.mintgreen,
         actions: _isSearching
             ? [
           IconButton(
@@ -340,7 +340,7 @@ class _MainhomePageState extends State<MainhomePage> {
           final success = await Navigator.push(
             context, MaterialPageRoute(builder: (context) => RegistarPage()),);
           if (success != null && success) {
-            fetchtradeBoard(); // 새로운 게시글이 등록되었으므로 게시글 목록을 다시 불러옴
+            fetchtradeBoard();
             setState(() {});
           }
         },
