@@ -115,7 +115,12 @@ flutter:
       fonts:
         - asset: assets/fonts/NotoSansKR-Light.ttf
           weight: 200
-
-
-  # For details regarding fonts from package dependencies,
+    - family: NanumGothic
+      fonts:
+        - asset: assets/fonts/NanumGothic-Bold.ttf
+          weight: 600
+        - asset: assets/fonts/NanumGothic-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/NanumGothic-Regular.ttf
+          weight: 200
   # see https://flutter.dev/custom-fonts/#from-packages

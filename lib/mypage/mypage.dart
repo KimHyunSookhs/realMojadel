@@ -4,15 +4,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mojadel2/Config/ImagePathProvider.dart';
 import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:mojadel2/colors/colors.dart';
-import 'package:mojadel2/mypage/signup/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'getboardcount/getBoardCount.dart';
-import 'login/loginpage.dart';
+import 'getboardcount/getRecipeBoardCount.dart';
+import 'getboardcount/getTradeBoardCount.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
+import 'optionMenu/optionMenu.dart';
 
 class MyPageSite extends StatefulWidget {
   const MyPageSite({Key? key}) : super(key: key);
@@ -26,16 +25,17 @@ class _MyPageSiteState extends State<MyPageSite> {
   String? _userEmail;
   String? _jwtToken;
   int? _userBoardCount;
+  int? _userRecipeBoardCount;
   String? _profileImageUrl;
   ImagePicker picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _loadUserInfo();
+    loadUserInfo();
   }
 
-  Future<void> _loadUserInfo() async {
+  Future<void> loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     _jwtToken = prefs.getString('jwtToken');
     if (_jwtToken != null) {
@@ -46,16 +46,6 @@ class _MyPageSiteState extends State<MyPageSite> {
         _profileImageUrl = userInfo['profileImage'];
       });
     }
-  }
-
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwtToken');
-    setState(() {
-      _nickname = null;
-      _jwtToken = null; // jwtToken 초기화
-      _profileImageUrl = null;
-    });
   }
 
   Future<void> _uploadImage(File imageFile) async {
@@ -87,7 +77,6 @@ class _MyPageSiteState extends State<MyPageSite> {
       }
     }
   }
-
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
@@ -100,12 +89,38 @@ class _MyPageSiteState extends State<MyPageSite> {
     }
   }
 
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwtToken');
+    setState(() {
+      _nickname = null;
+      _jwtToken = null;
+      _profileImageUrl = null;
+    });
+  }
+  Future<void> updateJwtToken(String? jwtToken) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('jwtToken', jwtToken!);
+    setState(() {
+      _jwtToken = jwtToken;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('마이페이지'),
         backgroundColor: AppColors.mintgreen,
+        actions: [
+          OptionMenu(
+            userEmail: _userEmail,
+            jwtToken: _jwtToken,
+            loadUserInfo: loadUserInfo,
+            updateJwtToken: (String? jwtToken) => updateJwtToken(jwtToken),
+            logoutCallback: logout,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -119,8 +134,8 @@ class _MyPageSiteState extends State<MyPageSite> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.black, // 테두리 선의 색상 설정
-                        width: 1.0, // 테두리 선의 두께 설정
+                        color: Colors.black,
+                        width: 1.0,
                       ),
                     ),
                     child: CircleAvatar(
@@ -134,48 +149,96 @@ class _MyPageSiteState extends State<MyPageSite> {
                     ),
                   ),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         _nickname ?? '비회원',
-                        style: TextStyle(fontSize: 23),
+                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SizedBox(
-                            width: 30,
+                      SizedBox(height: 6,),
+                      Container(
+                        padding: const EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white70,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: Colors.grey.shade300, // 테두리 색상
+                            width: 1.0, // 테두리 두께
                           ),
-                          Row(
+                        ),
+                        child: IntrinsicHeight(
+                          child: Row(
                             children: [
-                              Text('요모조모 '),
-                              FutureBuilder<int?>(
-                                future: getUserPostsCount(
-                                    _userEmail ?? '', _jwtToken ?? '', _nickname), // getUserPostsCount 함수 사용
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return Text('0');
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else {
-                                    final int? postsCount = snapshot.data;
-                                    _userBoardCount = postsCount; // _userBoardCount에 postsCount 값 할당
-                                    return Text(postsCount != null ? '$postsCount' : '0');
-                                  }
-                                },
+                              SizedBox(width: 5),
+                              Row(
+                                children: [
+                                  Text('요모조모 '),
+                                  FutureBuilder<int?>(
+                                    future: getUserPostsCount(
+                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Text('0');
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final int? postsCount = snapshot.data;
+                                        _userBoardCount = postsCount;
+                                        return Text(postsCount != null ? '$postsCount' : '0');
+                                      }
+                                    },
+                                  ),
+                                  Text('개'),
+                                  VerticalDivider(
+                                    width: 12,
+                                    thickness: 0.6,
+                                    color: Colors.black,
+                                  ),
+                                  Text('레시피 '),
+                                  FutureBuilder<int?>(
+                                    future: getUserRecipePostsCount(
+                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Text('0');
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final int? postsCount = snapshot.data;
+                                        _userBoardCount = postsCount;
+                                        return Text(postsCount != null ? '$postsCount' : '0');
+                                      }
+                                    },
+                                  ),
+                                  Text('개'),
+                                  VerticalDivider(
+                                    width: 12,
+                                    thickness: 0.6,
+                                    color: Colors.black,
+                                  ),
+                                  Text('중고거래 '),
+                                  FutureBuilder<int?>(
+                                    future: getUserTradePostsCount(
+                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Text('0');
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final int? postsCount = snapshot.data;
+                                        _userBoardCount = postsCount;
+                                        return Text(postsCount != null ? '$postsCount' : '0');
+                                      }
+                                    },
+                                  ),
+                                  Text('개'),
+                                  SizedBox(width: 5),
+                                ],
                               ),
-                              Text('개')
                             ],
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('팔로잉 0명'),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('팔로워 0명'),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -188,39 +251,6 @@ class _MyPageSiteState extends State<MyPageSite> {
                 getImage(ImageSource.gallery);
               },
               child: Text('프로필 사진 변경'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
-                );
-              },
-              child: Text('회원가입'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LogInPage()),
-                ).then((jwtToken) {
-                  if (jwtToken != null) {
-                    _loadUserInfo();
-                  }
-                });
-              },
-              child: Text('로그인'),
-            ),
-            TextButton(
-              onPressed: () async {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('로그아웃 완료'),
-                  ),
-                );
-                await _logout();
-              },
-              child: Text('로그아웃'),
             ),
           ],
         ),

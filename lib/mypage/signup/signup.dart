@@ -128,9 +128,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       body: requestBody,);
 
                     if (response.statusCode == 200) {
-                      // 서버로부터 성공적으로 응답 받음
                       print('회원가입 성공');
-                      Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.of(context).pop();
                     } else {
                       // 서버로부터 오류 응답 받음
                       print('회원가입 실패: ${response.body}');

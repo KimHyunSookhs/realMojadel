@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'deletePost.dart';
-import '../detailboard.dart';
 import 'editPost.dart';
 
 Future<void> handleMenuSelection(BuildContext context, String value, String? userEmail, String writerEmail, int postId, String jwtToken, String title, String content, Function setState, List<String> parsedBoardImageList) async {

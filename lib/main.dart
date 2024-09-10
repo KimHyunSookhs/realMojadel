@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         return MaterialApp(
           title: 'mojadel',
+          theme:ThemeData(fontFamily: 'NanumGothic'),
           debugShowCheckedModeBanner: false,
           routes: {
             '/login': (context) => LogInPage(),
