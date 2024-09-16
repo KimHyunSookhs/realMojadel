@@ -8,7 +8,7 @@ class RecipeBoardListItem {
   final int viewCount;
   final String writeDatetime;
   final String writerNickname;
-  final List<String> writerProfileImage;
+  final String writerProfileImage;
   final int type;
   final int cookingTime;
   final String step1_content;

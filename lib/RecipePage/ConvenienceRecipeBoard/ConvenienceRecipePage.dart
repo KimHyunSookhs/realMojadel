@@ -87,7 +87,7 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
                   viewCount: data['viewCount'] ?? 0,
                   writeDatetime: data['writeDatetime'] ?? '',
                   writerNickname: data['writerNickname'],
-                  writerProfileImage: writerProfileImage,
+                  writerProfileImage: data['writerProfileImage'],
                   type: data['type'],
                   cookingTime: data['cookingTime'],
                   step1_content: data['step1_content']??'',

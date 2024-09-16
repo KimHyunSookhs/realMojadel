@@ -90,8 +90,6 @@ class _RecipePageState extends State<RecipePage> {
               onSuccess(messages);
               streamController.add(messages);
             }
-          } else {
-            print('recipelatestList는 리스트가 아닙니다.');
           }
         } else {
           print('recipelatestList가 null입니다.');
@@ -252,7 +250,7 @@ class _RecipePageState extends State<RecipePage> {
           viewCount: data['viewCount'] ?? 0,
           writeDatetime: data['writeDatetime'] ?? '',
           writerNickname: data['writerNickname'],
-          writerProfileImage: writerProfileImage,
+          writerProfileImage: data['writerProfileImage'],
           type: data['type'],
           cookingTime: data['cookingTime'],
           step1_content: data['step1_content']??'',

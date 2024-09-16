@@ -186,7 +186,7 @@ class _EditTradeState extends State<EditTradePage> {
       children: [
         Text(
           '이미지',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 10),
         if (_boardImageList != null && _boardImageList!.isNotEmpty)

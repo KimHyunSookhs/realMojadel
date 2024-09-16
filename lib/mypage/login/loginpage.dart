@@ -36,7 +36,6 @@ class _LogInPageState extends State<LogInPage> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       final String jwtToken = responseData['token']; // Assuming the token key is 'token'
-      print('JWT 토큰: $jwtToken');
       return jwtToken;
     } else {
       print('로그인 실패');
@@ -85,12 +84,13 @@ class _LogInPageState extends State<LogInPage> {
                   String? jwtToken = await _getJwtToken(email, password);
                   print("email: ${email}");
                   if (jwtToken != null) {
-                    // 로그인 성공 시 처리
-                    print('로그인 성공');
                     final prefs = await SharedPreferences.getInstance();
                     prefs.setString('jwtToken', jwtToken);
                     prefs.setString('userEmail', email);
                     Navigator.pop(context, jwtToken);
+                    setState(() {
+
+                    });
                   }
                      else {
                       // 로그인 실패 시 처리

@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mojadel2/mypage/propfileChange/propfileChange.dart';
 import '../login/loginpage.dart';
 import '../signup/signup.dart';
 
@@ -8,6 +10,8 @@ class OptionMenu extends StatelessWidget {
   final Function() loadUserInfo;
   final Function(String?) updateJwtToken;
   final Function() logoutCallback;
+  final Function(File imageFile) uploadImage;
+  final String? profileImageUrl;
 
   OptionMenu({
     required this.userEmail,
@@ -15,6 +19,8 @@ class OptionMenu extends StatelessWidget {
     required this.loadUserInfo,
     required this.updateJwtToken,
     required this.logoutCallback,
+    required this.uploadImage,
+    this.profileImageUrl,
   });
 
   Future<void> handleMenuSelection(BuildContext context, String value) async {
@@ -48,6 +54,18 @@ class OptionMenu extends StatelessWidget {
       }
     } else {
       switch (value) {
+        case 'changeProfile':
+       await   Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileChangePage(
+                uploadImage: uploadImage,  
+                profileImageUrl: profileImageUrl, 
+              ),
+            ),
+          );
+          loadUserInfo();  // user정보를 다시한번 불러와서 프로필 이미지 변경된것 바로 확인가능
+          break;
         case 'logout':
           logoutCallback();
           break;
@@ -62,15 +80,29 @@ class OptionMenu extends StatelessWidget {
         handleMenuSelection(context, value);
       },
       itemBuilder: (BuildContext context) {
-        return (jwtToken == null ? {'signup', 'login'} : {'logout'}).map((String choice) {
-          return PopupMenuItem<String>(
-            value: choice,
-            child: Text(
-              choice == 'signup' ? '회원가입' : choice == 'login' ? '로그인' : '로그아웃',
-            ),
-          );
-        }).toList();
+        if (jwtToken == null) {
+          return {'signup', 'login'}.map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Text(
+                choice == 'signup' ? '회원가입' : '로그인',
+              ),
+            );
+          }).toList();
+        } else {
+          return {'changeProfile', 'logout'}.map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Text(
+                choice == 'changeProfile' ? '프로필 변경' : '로그아웃',
+              ),
+            );
+          }).toList();
+        }
       },
     );
   }
 }
+
+
+

@@ -10,7 +10,7 @@ class TradeBoardListItem {
   final String tradeLocation;
   final String price;
   final String writerNickname;
-  final List<String> writerProfileImage;
+  final String writerProfileImage;
 
   TradeBoardListItem(
       this.boardNumber,

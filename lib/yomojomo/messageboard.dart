@@ -15,8 +15,8 @@ class MessageBoard extends StatefulWidget {
 }
 
 class _MessageBoardState extends State<MessageBoard> {
-  List<BoardListItem> _messages = [];
-  late StreamController<List<BoardListItem>> _messageStreamController;
+  List<TradeBoardListItem> _messages = [];
+  late StreamController<List<TradeBoardListItem>> _messageStreamController;
   bool _isMounted = false;
   bool _isSearching = false;
   TextEditingController _searchController = TextEditingController();
@@ -24,7 +24,7 @@ class _MessageBoardState extends State<MessageBoard> {
   @override
   void initState() {
     super.initState();
-    _messageStreamController = StreamController<List<BoardListItem>>();
+    _messageStreamController = StreamController<List<TradeBoardListItem>>();
     _fetchMessages(); // Fetch messages when the widget initializes
   }
 
@@ -37,7 +37,7 @@ class _MessageBoardState extends State<MessageBoard> {
         if (_isMounted && responseData['latestList'] != null) {
           if (responseData['latestList'] is List) {
             final List<dynamic> messageList = responseData['latestList'];
-            List<BoardListItem> messages = [];
+            List<TradeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
               if (data['boardTitleImage'] != null) {
@@ -48,7 +48,7 @@ class _MessageBoardState extends State<MessageBoard> {
                 }
               }
               messages.add(
-                BoardListItem(
+                TradeBoardListItem(
                   data['boardNumber'],
                   data['title'],
                   data['content'],
@@ -58,6 +58,7 @@ class _MessageBoardState extends State<MessageBoard> {
                   data['viewCount'] ?? 0,
                   data['writeDatetime'] ?? '',
                   data['writerNickname'] ?? '',
+                  data['writerProfileImage'],
                 ),
               );
             }
@@ -119,7 +120,7 @@ class _MessageBoardState extends State<MessageBoard> {
         final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
         if (responseData['searchList'] != null) {
           final List<dynamic> searchList = responseData['searchList'];
-          List<BoardListItem> searchResults = [];
+          List<TradeBoardListItem> searchResults = [];
           for (var data in searchList) {
             List<String> boardTitleImageList = [];
             if (data['boardTitleImage'] != null) {
@@ -130,7 +131,7 @@ class _MessageBoardState extends State<MessageBoard> {
               }
             }
             searchResults.add(
-              BoardListItem(
+              TradeBoardListItem(
                 data['boardNumber'],
                 data['title'],
                 data['content'],
@@ -140,6 +141,7 @@ class _MessageBoardState extends State<MessageBoard> {
                 data['viewCount'] ?? 0,
                 data['writeDatetime'] ?? '',
                 data['writerNickname'] ?? '',
+                data['writerProfileImage'],
               ),
             );
           }
@@ -191,7 +193,7 @@ class _MessageBoardState extends State<MessageBoard> {
             ),
           ],
         ),
-        body: StreamBuilder<List<BoardListItem>>(
+        body: StreamBuilder<List<TradeBoardListItem>>(
           stream: _messageStreamController.stream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Config/getUserInfo.dart';
 
-
 class ChattingPage extends StatefulWidget {
   final String writerNickname;
   final String title;
@@ -55,29 +54,31 @@ class _ChattingPageState extends State<ChattingPage> {
           isSeller = currentUserNickname == widget.writerNickname;
         });
       } catch (e) {
-        print('Failed to load user info: $e');
       }
-    } else {
-      print('JWT Token is null');
     }
   }
 
   Future<void> createOrJoinChatRoom() async {
-    if (currentUserNickname == null) {
-      print('Current user nickname is null');
-      return;
-    }
-
-    // 고유한 chatRoomId 생성
-    List<String> participants = [widget.writerNickname, currentUserNickname!];
-    participants.sort(); // 알파벳 순으로 정렬하여 동일한 ID 생성 보장
-    String chatRoomId = widget.title + "_" + participants.join("_");
-
+    String chatRoomId = widget.title;
     try {
       DocumentReference chatRoomRef = FirebaseFirestore.instance.collection('chatRooms').doc(chatRoomId);
       DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
 
-      if (!chatRoomSnapshot.exists) {
+      // Check if chat room exists
+      if (chatRoomSnapshot.exists) {
+        // Check if the current user is a participant
+        Map<String, dynamic>? data = chatRoomSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('participants')) {
+          Map<String, String> participantsMap = Map<String, String>.from(data['participants']);
+
+          // If the user is not a participant, add them
+          if (!participantsMap.containsValue(currentUserNickname!)) {
+            participantsMap['buyer'] = currentUserNickname!;
+            await chatRoomRef.update({'participants': participantsMap});
+          }
+        }
+      } else {
+        // If chat room does not exist, create it
         await chatRoomRef.set({
           'chatRoomId': chatRoomId,
           'writerNickname': widget.writerNickname,
@@ -85,29 +86,45 @@ class _ChattingPageState extends State<ChattingPage> {
           'price': widget.price,
           'boardImageList': widget.boardImageList,
           'participants': {
-            'buyer': isSeller ? widget.writerNickname : currentUserNickname,
-            'seller': isSeller ? currentUserNickname : widget.writerNickname,
+            'buyer': currentUserNickname!,
+            'seller': widget.writerNickname,
           }
         });
       }
-
       setState(() {
         messagesCollection = chatRoomRef.collection('messages');
       });
     } catch (e) {
-      print('Failed to create or retrieve chat room: $e');
+      print('Failed to create or join chat room: $e');
     }
   }
 
 
+  Future<bool> _isUserParticipant() async {
+    if (currentUserNickname == null) return false;
+
+    String chatRoomId = widget.title;
+
+    DocumentReference chatRoomRef = FirebaseFirestore.instance.collection('chatRooms').doc(chatRoomId);
+    DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
+
+    if (chatRoomSnapshot.exists) {
+      Map<String, dynamic>? data = chatRoomSnapshot.data() as Map<String, dynamic>?;
+      if (data != null && data.containsKey('participants')) {
+        Map<String, String> participantsMap = Map<String, String>.from(data['participants']);
+        return participantsMap.containsValue(currentUserNickname);
+      }
+    }
+    return false;
+  }
+
   String formatTimestamp(Timestamp timestamp) {
-    DateTime date = timestamp.toDate().toLocal().add(Duration(hours: 9)); // UTC+9
+    DateTime date = timestamp.toDate().toLocal().add(Duration(hours: 9));
     return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
   }
 
   void sendMessage() async {
     if (_messageController.text.trim().isEmpty || currentUserNickname == null) {
-      print('Cannot send message: message is empty or currentUserNickname is null');
       return;
     }
     if (messagesCollection != null) {
@@ -126,27 +143,22 @@ class _ChattingPageState extends State<ChattingPage> {
     }
   }
 
-  Future<bool> _isUserParticipant() async {
-    String chatRoomId = widget.title + currentUserNickname!;
-    DocumentReference chatRoomRef = FirebaseFirestore.instance.collection('chatRooms').doc(chatRoomId);
-    DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
-
-    if (chatRoomSnapshot.exists) {
-      Map<String, dynamic>? data = chatRoomSnapshot.data() as Map<String, dynamic>?;
-      if (data != null && data.containsKey('participants')) {
-        Map<String, String> participants = Map<String, String>.from(data['participants']);
-        return participants.containsValue(currentUserNickname);
-      }
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
+    String appBarTitle;
+    if (currentUserNickname == null) {
+      appBarTitle = 'Chat';
+    } else if (currentUserNickname == widget.writerNickname) {
+      appBarTitle = '${widget.writerNickname}';
+    } else {
+      appBarTitle = '${currentUserNickname}';
+    }
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(widget.writerNickname ?? 'Chat'),
+        title: Text(
+            appBarTitle, style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         backgroundColor: AppColors.mintgreen,
       ),
       body: Column(
@@ -193,16 +205,12 @@ class _ChattingPageState extends State<ChattingPage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   return FutureBuilder<bool>(
                     future: _isUserParticipant(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (snapshot.hasData && !snapshot.data!) {
                         return Center(child: Text('You are not a participant of this chat.'));
                       } else {
@@ -211,8 +219,6 @@ class _ChattingPageState extends State<ChattingPage> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
                             } else if (!snapshot.hasData) {
                               return Center(child: Text('No messages yet.'));
                             }
@@ -230,7 +236,7 @@ class _ChattingPageState extends State<ChattingPage> {
                                       margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                                       padding: EdgeInsets.all(8.0),
                                       decoration: BoxDecoration(
-                                        color: isCurrentUser ? Colors.blue : Colors.grey.shade300,
+                                        color: isCurrentUser ? AppColors.mintgreen : Colors.grey.shade300,
                                         borderRadius: isCurrentUser
                                             ? BorderRadius.only(
                                           topLeft: Radius.circular(12.0),
@@ -261,7 +267,7 @@ class _ChattingPageState extends State<ChattingPage> {
                                                 ? formatTimestamp(message['timestamp'] as Timestamp)
                                                 : '전송중...',
                                             style: TextStyle(
-                                              color: isCurrentUser ? Colors.white70 : Colors.black54,
+                                              color: isCurrentUser ? Colors.white : Colors.black54,
                                               fontSize: 10.0,
                                             ),
                                           ),

@@ -1,4 +1,4 @@
-class BoardListItem {
+class TradeBoardListItem {
   final int boardNumber;
   final String title;
   final String content;
@@ -8,7 +8,8 @@ class BoardListItem {
   final int viewCount; // 추가된 viewCount
   final String writeDatetime; // 추가된 writeDatetime
   final String writerNickname;
-  BoardListItem(
+  final String writerProfileImage;
+  TradeBoardListItem(
       this.boardNumber,
       this.title,
       this.content,
@@ -18,5 +19,6 @@ class BoardListItem {
       this.viewCount,
       this.writeDatetime,
       this.writerNickname,
+      this.writerProfileImage,
       );
 }

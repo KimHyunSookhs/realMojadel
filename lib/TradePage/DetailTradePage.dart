@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mojadel2/Comment/commentList.dart';
@@ -14,18 +15,16 @@ import '../yomojomo/Detailboard/showWriteTime.dart';
 import 'ChatBoard/ChattingPage.dart';
 import 'EditTrade.dart';
 
-class DetailPage extends StatefulWidget {
+class DetailTradePage extends StatefulWidget {
   final int tradeId;
-  final int favoriteCount;
   final String chatRoomId;
-  const DetailPage({Key? key, required this.tradeId, required this.chatRoomId,
-    required this.favoriteCount}) : super(key: key);
+  const DetailTradePage({Key? key, required this.tradeId, required this.chatRoomId,}) : super(key: key);
 
   @override
-  _DetailPageState createState() => _DetailPageState();
+  _DetailTradePageState createState() => _DetailTradePageState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _DetailTradePageState extends State<DetailTradePage> {
   String title = '';
   String content = '';
   String writeDatetime = '';
@@ -39,7 +38,7 @@ class _DetailPageState extends State<DetailPage> {
   String? _jwtToken;
   bool isFavorite = false;
   int? boardNumber;
-  String boardImageList = ''; // Add imageUrl
+  String boardImageList = '';
   bool isUpdatingFavorite = false;
   String? _profileImageUrl;
   String? _nickname;
@@ -84,6 +83,7 @@ class _DetailPageState extends State<DetailPage> {
           _writerProfileImageUrl = responseData['writerProfileImage'];
           boardImageList = responseData['boardImageList'] != null
               ? json.encode(responseData['boardImageList']) : '';
+          isLoading = false;
         });
       } else {
         setState(() {
@@ -107,6 +107,29 @@ class _DetailPageState extends State<DetailPage> {
         _userEmail = userInfo['email'];
         _profileImageUrl = userInfo['profileImage'];
       });
+    }
+  }
+
+  Future<void> toggleTradeCompleted() async {
+    final tradeRef = FirebaseFirestore.instance.collection('trades').doc(widget.tradeId.toString());
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot tradeSnapshot = await transaction.get(tradeRef);
+        if (tradeSnapshot.exists) {
+          final data = tradeSnapshot.data() as Map<String, dynamic>?;
+          if (data != null) {
+            final currentCompleted = data['completed'] ?? false;
+            transaction.set(tradeRef, {'completed': !currentCompleted}, SetOptions(merge: true));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(currentCompleted ? '거래 완료가 취소되었습니다' : '거래가 완료되었습니다'),
+              ),
+            );
+          }
+        }
+      });
+    } catch (error) {
+      print('Error toggling trade completion: $error');
     }
   }
 
@@ -168,8 +191,6 @@ class _DetailPageState extends State<DetailPage> {
         setState(() {
           commentCount++; // Increment comment count
         });
-      } else {
-        print('Failed to post comment: ${response.statusCode}');
       }
     } catch (error) {
       print('Failed to post comment: $error');
@@ -195,11 +216,7 @@ class _DetailPageState extends State<DetailPage> {
             comments = fetchedComments;
             commentCount = fetchedComments.length;
           });
-        } else {
-          print('Comments data is not in the expected format');
         }
-      } else {
-        print('Failed to fetch comments: ${response.statusCode}');
       }
     } catch (error) {
       print('Failed to fetch comments: $error');
@@ -219,7 +236,7 @@ class _DetailPageState extends State<DetailPage> {
           commentCount--; // 댓글 수를 줄임
           comments.removeWhere((comment) => comment.commentNumber == commentNumber); // Remove comment from list
         });
-        fetchComments(); // Fetch comments again to update the UI
+        fetchComments();
       }
     } catch (error) {}
   }
@@ -227,8 +244,7 @@ class _DetailPageState extends State<DetailPage> {
     final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
-
-        'content': newContent, // New content for the comment
+        'content': newContent,
       };
       http.Response response = await http.patch(
         Uri.parse(uri),
@@ -240,8 +256,6 @@ class _DetailPageState extends State<DetailPage> {
       );
       if (response.statusCode == 200) {
         fetchComments();
-      } else {
-        print('Failed to edit comment: ${response.statusCode}');
       }
     } catch (error) {
       print('Failed to edit comment: $error');
@@ -249,7 +263,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> toggleFavorite() async {
-    if (isUpdatingFavorite) return; // 이미 업데이트 중이면 아무 작업도 하지 않음
+    if (isUpdatingFavorite) return;
     setState(() {
       isUpdatingFavorite = true;
     });
@@ -304,11 +318,7 @@ class _DetailPageState extends State<DetailPage> {
             favorites = fetchFavorits;
             favoriteCount = favorites.length;
           });
-        } else {
-          print('Comments data is not in the expected format');
         }
-      } else {
-        print('Failed to fetch comments: ${response.statusCode}');
       }
     } catch (error) {
       print('Failed to fetch comments: $error');
@@ -465,9 +475,34 @@ class _DetailPageState extends State<DetailPage> {
                             style: TextStyle(
                                 fontSize: 26, fontWeight: FontWeight.bold),
                           ),
-                          Text(
-                            tradeLocation,
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          Row(
+                            children: [
+                              Text(
+                                tradeLocation,
+                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                              SizedBox(width: 200,),
+                              if (writerEmail == _userEmail)
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      toggleTradeCompleted();
+                                    },
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size.zero,
+                                      padding: EdgeInsets.all(3.0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      foregroundColor: Colors.black,
+                                      side: BorderSide(color: Colors.black, width: 0.3),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(3.0),
+                                      ),
+                                    ),
+                                    child: Text('거래완료',style: TextStyle(fontSize: 14, color: Colors.grey),),
+                                  ),
+                                ),
+                            ],
                           ),
                         ],
                       ),

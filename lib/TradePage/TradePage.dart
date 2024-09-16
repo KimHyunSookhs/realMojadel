@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mojadel2/TradePage/DetailPage.dart';
+import 'package:mojadel2/TradePage/DetailTradePage.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:mojadel2/TradePage/registar/registar_page.dart';
@@ -24,13 +25,14 @@ class _MainhomePageState extends State<MainhomePage> {
   bool _isSearching = false;
   String? chatRoomId;
   TextEditingController _searchController = TextEditingController();
+  Map<int, bool> _tradeCompletionStatus = {};
 
   @override
   void initState() {
     super.initState();
     _isMounted = true;
     _messageStreamController = StreamController<List<TradeBoardListItem>>();
-    fetchtradeBoard(); // Fetch messages when the widget initializes
+    fetchtradeBoard();
   }
 
   @override
@@ -41,11 +43,24 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   String formatDatetime(String datetime) {
-    if (datetime != null && datetime.isNotEmpty) { // Add null check here
+    if (datetime != null && datetime.isNotEmpty) {
       DateTime parsedDatetime = DateTime.parse(datetime).toUtc();
       return DateFormat('MM/dd').format(parsedDatetime);
     } else {
       return '';
+    }
+  }
+  Future<void> checkTradeCompletionStatus(int tradeId) async {
+    final tradeRef = FirebaseFirestore.instance.collection('trades').doc(tradeId.toString());
+    final tradeSnapshot = await tradeRef.get();
+    if (tradeSnapshot.exists) {
+      final data = tradeSnapshot.data();
+      bool isCompleted = data?['completed'] ?? false;
+      if (_isMounted) {
+        setState(() {
+          _tradeCompletionStatus[tradeId] = isCompleted;
+        });
+      }
     }
   }
 
@@ -61,19 +76,11 @@ class _MainhomePageState extends State<MainhomePage> {
             List<TradeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
-              List<String> writerProfileImage = [];
               if (data['boardTitleImage'] != null) {
                 if (data['boardTitleImage'] is String) {
                   boardTitleImageList = [data['boardTitleImage']];
                 } else {
                   boardTitleImageList = List<String>.from(data['boardTitleImage']);
-                }
-              }
-              if (data['writerProfileImage'] != null) {
-                if (data['writerProfileImage'] is String) {
-                  writerProfileImage = [data['writerProfileImage']];
-                } else {
-                  writerProfileImage = List<String>.from(data['writerProfileImage']);
                 }
               }
               messages.add(
@@ -89,24 +96,27 @@ class _MainhomePageState extends State<MainhomePage> {
                   data['tradeLocation']?? '',
                   data['price']?? '',
                   data['writerNickname'],
-                  writerProfileImage
+                  data['writerProfileImage'],
                 ),
               );
+              await checkTradeCompletionStatus(data['boardNumber']);
             }
+
+            messages.sort((a, b) {
+              bool aCompleted = _tradeCompletionStatus[a.boardNumber] ?? false;
+              bool bCompleted = _tradeCompletionStatus[b.boardNumber] ?? false;
+              if (aCompleted && !bCompleted) return 1;
+              if (!aCompleted && bCompleted) return -1;
+              return 0;
+            });
             if (_isMounted) {
               setState(() {
                 _messages = messages;
-                _messageStreamController.add(messages); // 스트림에 데이터 푸시
+                _messageStreamController.add(messages);
               });
             }
-          } else {
-            print('latestList is not a list');
           }
-        } else {
-          print('tradeBoardListItemList is null');
         }
-      } else {
-        print('Failed to fetch messages: ${response.statusCode}');
       }
     } catch (error) {
       if (_isMounted) {
@@ -114,6 +124,7 @@ class _MainhomePageState extends State<MainhomePage> {
       }
     }
   }
+
 
   void _startSearch() {
     setState(() {
@@ -170,7 +181,7 @@ class _MainhomePageState extends State<MainhomePage> {
                 data['tradeLocation']?? '',
                 data['price']?? '',
                 data['writerNickname'],
-                writerProfileImage
+                data['writerProfileImage'],
               ),
             );
           }
@@ -205,7 +216,7 @@ class _MainhomePageState extends State<MainhomePage> {
             _performSearch(value);
           },
         )
-            : Text('화정동'),
+            : Text('중고거래'),
         backgroundColor: AppColors.mintgreen,
         actions: _isSearching
             ? [
@@ -219,16 +230,6 @@ class _MainhomePageState extends State<MainhomePage> {
             icon: Icon(Icons.search),
             onPressed: _startSearch,
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications),
-            color: Colors.black,
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.menu),
-            color: Colors.black,
-          )
         ],
       ),
       body: Padding(
@@ -253,9 +254,8 @@ class _MainhomePageState extends State<MainhomePage> {
                       final success = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailPage(
+                          builder: (context) => DetailTradePage(
                             tradeId: message.boardNumber,
-                            favoriteCount: message.favoriteCount,
                             chatRoomId: chatRoomId ?? '',
                           ),
                         ),
@@ -287,8 +287,25 @@ class _MainhomePageState extends State<MainhomePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(message.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                                    SizedBox(height: 5),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          message.title,
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                                        ),
+                                        if (_tradeCompletionStatus[message.boardNumber] == true) ...[
+                                          Text(
+                                            '거래완료',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
                                     Row(
                                       children: [
                                         Text('${message.tradeLocation}'),

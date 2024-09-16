@@ -4,10 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mojadel2/Config/ImagePathProvider.dart';
 import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:mojadel2/colors/colors.dart';
+import 'package:mojadel2/mypage/getboardcount/showBoardCounts.dart';
+import 'package:mojadel2/mypage/tabBar/TabBarList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'getboardcount/getBoardCount.dart';
-import 'getboardcount/getRecipeBoardCount.dart';
-import 'getboardcount/getTradeBoardCount.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -19,20 +18,22 @@ class MyPageSite extends StatefulWidget {
   State<MyPageSite> createState() => _MyPageSiteState();
 }
 
-class _MyPageSiteState extends State<MyPageSite> {
+class _MyPageSiteState extends State<MyPageSite>
+    with SingleTickerProviderStateMixin {
   String? _nickname;
   File? _imageFile;
   String? _userEmail;
   String? _jwtToken;
-  int? _userBoardCount;
-  int? _userRecipeBoardCount;
   String? _profileImageUrl;
   ImagePicker picker = ImagePicker();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     loadUserInfo();
+    _tabController =
+        TabController(length: 3, vsync: this);
   }
 
   Future<void> loadUserInfo() async {
@@ -66,7 +67,6 @@ class _MyPageSiteState extends State<MyPageSite> {
         if (response.statusCode == 200) {
           final imageUrl = jsonDecode(response.body)['imageFile'];
           setState(() {
-            _imageFile = imageFile;
             _profileImageUrl = imageUrl;
           });
         } else {
@@ -77,15 +77,16 @@ class _MyPageSiteState extends State<MyPageSite> {
       }
     }
   }
+
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
       String imagePath = await saveImagePermanently(File(pickedFile.path));
       setState(() {
-        _imageFile = File(imagePath);  // 프로필 이미지 파일 설정
-        _profileImageUrl = imagePath;  // 프로필 이미지 URL 설정
+        _imageFile = File(imagePath);
+        _profileImageUrl = imagePath;
       });
-        _uploadImage(File(imagePath));  // 이미지 업로드
+        _uploadImage(File(imagePath));
     }
   }
 
@@ -96,6 +97,8 @@ class _MyPageSiteState extends State<MyPageSite> {
       _nickname = null;
       _jwtToken = null;
       _profileImageUrl = null;
+    });
+    setState(() {
     });
   }
   Future<void> updateJwtToken(String? jwtToken) async {
@@ -119,6 +122,8 @@ class _MyPageSiteState extends State<MyPageSite> {
             loadUserInfo: loadUserInfo,
             updateJwtToken: (String? jwtToken) => updateJwtToken(jwtToken),
             logoutCallback: logout,
+            uploadImage: _uploadImage, // 이미지 업로드 함수 전달
+            profileImageUrl: _profileImageUrl,
           ),
         ],
       ),
@@ -166,78 +171,10 @@ class _MyPageSiteState extends State<MyPageSite> {
                             width: 1.0, // 테두리 두께
                           ),
                         ),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              SizedBox(width: 5),
-                              Row(
-                                children: [
-                                  Text('요모조모 '),
-                                  FutureBuilder<int?>(
-                                    future: getUserPostsCount(
-                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Text('0');
-                                      } else if (snapshot.hasError) {
-                                        return Text('Error: ${snapshot.error}');
-                                      } else {
-                                        final int? postsCount = snapshot.data;
-                                        _userBoardCount = postsCount;
-                                        return Text(postsCount != null ? '$postsCount' : '0');
-                                      }
-                                    },
-                                  ),
-                                  Text('개'),
-                                  VerticalDivider(
-                                    width: 12,
-                                    thickness: 0.6,
-                                    color: Colors.black,
-                                  ),
-                                  Text('레시피 '),
-                                  FutureBuilder<int?>(
-                                    future: getUserRecipePostsCount(
-                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Text('0');
-                                      } else if (snapshot.hasError) {
-                                        return Text('Error: ${snapshot.error}');
-                                      } else {
-                                        final int? postsCount = snapshot.data;
-                                        _userBoardCount = postsCount;
-                                        return Text(postsCount != null ? '$postsCount' : '0');
-                                      }
-                                    },
-                                  ),
-                                  Text('개'),
-                                  VerticalDivider(
-                                    width: 12,
-                                    thickness: 0.6,
-                                    color: Colors.black,
-                                  ),
-                                  Text('중고거래 '),
-                                  FutureBuilder<int?>(
-                                    future: getUserTradePostsCount(
-                                        _userEmail ?? '', _jwtToken ?? '', _nickname),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Text('0');
-                                      } else if (snapshot.hasError) {
-                                        return Text('Error: ${snapshot.error}');
-                                      } else {
-                                        final int? postsCount = snapshot.data;
-                                        _userBoardCount = postsCount;
-                                        return Text(postsCount != null ? '$postsCount' : '0');
-                                      }
-                                    },
-                                  ),
-                                  Text('개'),
-                                  SizedBox(width: 5),
-                                ],
-                              ),
-                            ],
-                          ),
+                        child: ShowBoardCounts(
+                          userEmail: _userEmail,
+                          jwtToken: _jwtToken,
+                          nickname: _nickname,
                         ),
                       ),
                     ],
@@ -246,11 +183,9 @@ class _MyPageSiteState extends State<MyPageSite> {
               ),
             ),
             Divider(),
-            TextButton(
-              onPressed: () {
-                getImage(ImageSource.gallery);
-              },
-              child: Text('프로필 사진 변경'),
+            Container(
+              height: 400,  // Provide a fixed height or adjust according to your layout
+              child: TabBarUsingController2(),
             ),
           ],
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mojadel2/RecipePage/RecipePage.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:mojadel2/TradePage/TradePage.dart';
@@ -17,12 +16,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static final XFile defaultImage = XFile('');
 
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget> [
+  static  List<Widget> _widgetOptions = <Widget> [
     MainhomePage(),
-    ChatBoardPage(sellerNickname: '현수',),
+    ChatBoardPage(),
     MessageBoard(),
     RecipePage(),
     MyPageSite(),
