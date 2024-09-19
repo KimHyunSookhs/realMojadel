@@ -8,8 +8,11 @@ import 'package:mojadel2/RecipePage/RecipeBoardList/RecipeBoardListItem.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyRecipecontents extends StatefulWidget {
-  const MyRecipecontents({super.key});
-
+  final VoidCallback onRefresh;
+  const MyRecipecontents({
+    Key? key,
+    required this.onRefresh,
+  }) : super(key: key);
   @override
   State<MyRecipecontents> createState() => _MyRecipecontentsState();
 }
@@ -209,6 +212,9 @@ class _MyRecipecontentsState extends State<MyRecipecontents> {
                                 ),
                               ),
                             );
+                            if (success == true) {
+                              widget.onRefresh();
+                            }
                           },
                         ),
                         if (index != messages.length - 1) Divider(),

@@ -4,7 +4,6 @@ import 'package:mojadel2/mypage/tabBar/MyRecipeContents.dart';
 import 'package:mojadel2/mypage/tabBar/MyTradeContents.dart';
 import 'package:mojadel2/mypage/tabBar/TabbarName.dart';
 
-
 const List<String> transactionTypes = ['중고거래', '공동구매'];
 const List<String> checkTransaction = ['거래 중', '거래 완료'];
 
@@ -66,13 +65,13 @@ class _TabBarUsingController2State extends State<TabBarUsingController2>
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 SingleChildScrollView(
-                  child: MyTradecontents(), // Only one instance here
+                  child: MyTradecontents(), 
                 ),
                 SingleChildScrollView(
-                  child: Myboardcontents(), // Only one instance here
+                  child: Myboardcontents(),
                 ),
                 SingleChildScrollView(
-                  child: MyRecipecontents(), // Only one instance here
+                  child: MyRecipecontents(onRefresh: () {  },),
                 ),
                 ListView.builder(
                   itemCount: 10,
@@ -81,16 +80,6 @@ class _TabBarUsingController2State extends State<TabBarUsingController2>
                       title: Text('D Item %index'),
                     );
                   },
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(10, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('C Content $index'),
-                      );
-                    }),
-                  ),
                 ),
                 SingleChildScrollView(
                   child: Column(

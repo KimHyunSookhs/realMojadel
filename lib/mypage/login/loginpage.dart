@@ -63,7 +63,7 @@ class _LogInPageState extends State<LogInPage> {
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: '이메일',
+                  labelText: '이메일',labelStyle: TextStyle(fontSize: 22)
                 ),
               ),
               SizedBox(height: 16.0),
@@ -72,29 +72,25 @@ class _LogInPageState extends State<LogInPage> {
                 controller: _passwordController,
                 obscureText: true, // 비밀번호를 숨깁니다.
                 decoration: InputDecoration(
-                  labelText: '비밀번호',
+                  labelText: '비밀번호',labelStyle: TextStyle(fontSize: 22)
                 ),
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () async {
                   // 사용자 정보 수집
                   String email = _emailController.text;
                   String password = _passwordController.text;
                   String? jwtToken = await _getJwtToken(email, password);
-                  print("email: ${email}");
                   if (jwtToken != null) {
                     final prefs = await SharedPreferences.getInstance();
                     prefs.setString('jwtToken', jwtToken);
                     prefs.setString('userEmail', email);
                     Navigator.pop(context, jwtToken);
                     setState(() {
-
                     });
                   }
                      else {
-                      // 로그인 실패 시 처리
-                      print('로그인 실패');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('로그인에 실패했습니다.'),

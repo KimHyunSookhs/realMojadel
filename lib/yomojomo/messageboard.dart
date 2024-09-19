@@ -145,13 +145,10 @@ class _MessageBoardState extends State<MessageBoard> {
               ),
             );
           }
-          print('${responseData}');
           setState(() {
             _messages = searchResults;
           });
           _messageStreamController.add(searchResults); // 스트림에 데이터 푸시
-        } else {
-          print('No search results found');
         }
       } else {
         print('Failed to perform search: ${response.statusCode}');
@@ -178,7 +175,7 @@ class _MessageBoardState extends State<MessageBoard> {
             },
           )
               : Text('요모조모'),
-          backgroundColor: AppColors.mintgreen, // Replace with AppColors.mintgreen if defined
+          backgroundColor: AppColors.mintgreen,
           actions: _isSearching
               ? [
             IconButton(

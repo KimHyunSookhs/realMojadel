@@ -293,6 +293,7 @@ class _DetailBoardState extends State<DetailBoard> {
   @override
   Widget build(BuildContext context) {
     List<String> imageUrls = parseBoardImageList(boardImageList);
+    bool isOwner = _nickname == writerNickname;
     return Scaffold(
       appBar: AppBar(
         title: Text('게시글'),
@@ -303,7 +304,8 @@ class _DetailBoardState extends State<DetailBoard> {
             Navigator.pop(context, true);
           },
         ),
-        actions: [
+        actions: isOwner
+        ?[
           PopupMenuButton<String>(
             onSelected: _handleMenuSelection,
             itemBuilder: (BuildContext context) {
@@ -315,7 +317,7 @@ class _DetailBoardState extends State<DetailBoard> {
               }).toList();
             },
           ),
-        ],
+        ] : []
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mojadel2/Config/ConfirmDelete.dart';
 import 'package:mojadel2/RecipePage/EditRecipe.dart';
+import 'package:mojadel2/RecipePage/viewCount.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -61,6 +62,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       fetchPostDetails();
       fetchComments();
       fetchFavorits();
+      increaseRecipeViewCount(widget.recipeId, _jwtToken!);
     });
   }
 
@@ -369,6 +371,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       step1_image, step2_image, step3_image, step4_image,
       step5_image, step6_image, step7_image, step8_image
     ];
+    bool isOwner = _nickname == writerNickname;
     return Scaffold(
       appBar: AppBar(
         title: Text('게시글'),
@@ -379,7 +382,8 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
             Navigator.pop(context, true);
           },
         ),
-        actions: [
+        actions: isOwner
+            ? [
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
@@ -389,16 +393,20 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              showDialog(context: context,
-                  builder: (BuildContext context){
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
                     return ConfirmDelete(
                         title: '게시글 삭제',
                         content: '정말로 이 게시글을 삭제하시겠습니까?',
-                        onDelete: deleteRecipeBoard);
-                  });
+                        onDelete: deleteRecipeBoard
+                    );
+                  }
+              );
             },
           ),
-        ],
+        ]
+            : [],
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

@@ -9,7 +9,6 @@ class ShowBoardCounts extends StatelessWidget {
   final String? nickname;
   ShowBoardCounts({this.userEmail, this.jwtToken, this.nickname});
 
-
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
@@ -18,6 +17,26 @@ class ShowBoardCounts extends StatelessWidget {
           SizedBox(width: 5),
           Row(
             children: [
+              Text('중고거래 '),
+              FutureBuilder<int?>(
+                future: getUserTradePostsCount(userEmail ?? '', jwtToken ?? '', nickname),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Text('0');
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final int? postsCount = snapshot.data;
+                    return Text(postsCount != null ? '$postsCount' : '0');
+                  }
+                },
+              ),
+              Text('개'),
+              VerticalDivider(
+                width: 12,
+                thickness: 0.6,
+                color: Colors.black,
+              ),
               Text('요모조모 '),
               FutureBuilder<int?>(
                 future: getUserPostsCount(userEmail ?? '', jwtToken ?? '', nickname),
@@ -41,26 +60,6 @@ class ShowBoardCounts extends StatelessWidget {
               Text('레시피 '),
               FutureBuilder<int?>(
                 future: getUserRecipePostsCount(userEmail ?? '', jwtToken ?? '', nickname),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text('0');
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final int? postsCount = snapshot.data;
-                    return Text(postsCount != null ? '$postsCount' : '0');
-                  }
-                },
-              ),
-              Text('개'),
-              VerticalDivider(
-                width: 12,
-                thickness: 0.6,
-                color: Colors.black,
-              ),
-              Text('중고거래 '),
-              FutureBuilder<int?>(
-                future: getUserTradePostsCount(userEmail ?? '', jwtToken ?? '', nickname),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Text('0');

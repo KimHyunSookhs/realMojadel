@@ -14,6 +14,7 @@ import '../colors/colors.dart';
 import '../yomojomo/Detailboard/showWriteTime.dart';
 import 'ChatBoard/ChattingPage.dart';
 import 'EditTrade.dart';
+import 'viewTradeCount.dart';
 
 class DetailTradePage extends StatefulWidget {
   final int tradeId;
@@ -57,6 +58,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     _loadUserInfo().then((_) {
       fetchTradeDetail();
       fetchComments();
+      increaseTradeViewCount(widget.tradeId, _jwtToken!);
       fetchFavorits();
     });
   }
@@ -328,6 +330,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
   @override
   Widget build(BuildContext context) {
     List<String> imageUrls = parseBoardImageList(boardImageList);
+    bool isOwner = _nickname == writerNickname;
     return Scaffold(
       appBar: AppBar(
         title:  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
@@ -339,7 +342,8 @@ class _DetailTradePageState extends State<DetailTradePage> {
             Navigator.pop(context, true);
           },
         ),
-        actions: [
+        actions: isOwner ?
+       [
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
@@ -358,7 +362,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
                   });
             },
           ),
-        ],
+        ] : []
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -577,28 +581,34 @@ class _DetailTradePageState extends State<DetailTradePage> {
                                 ),
                               ],
                             )),
-                        ElevatedButton(onPressed: (){
-                          Navigator.push(context, MaterialPageRoute(
+                        ElevatedButton(
+                          onPressed: (writerNickname == _nickname) ? null : () {
+                            Navigator.push(context, MaterialPageRoute(
                               builder: (context) => ChattingPage(
                                 writerNickname: writerNickname,
                                 boardImageList: boardImageList,
                                 title: title,
                                 price: price,
-                              )
-                          ));
-                        },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black,
-                              side: BorderSide(color: Colors.black, width: 0.5),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
                               ),
+                            ));
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            side: BorderSide(color: Colors.black, width: 0.5),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Text('채팅하기'))
+                          ),
+                          child: Text(
+                            '채팅하기',
+                            style: TextStyle(
+                              color: (writerNickname == _nickname) ? Colors.grey : Colors.black,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-
                   ),
                   const Divider(height: 20),
                   SizedBox(height: 8.0),

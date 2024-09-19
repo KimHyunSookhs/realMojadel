@@ -98,8 +98,6 @@ class _MyPageSiteState extends State<MyPageSite>
       _jwtToken = null;
       _profileImageUrl = null;
     });
-    setState(() {
-    });
   }
   Future<void> updateJwtToken(String? jwtToken) async {
     final prefs = await SharedPreferences.getInstance();

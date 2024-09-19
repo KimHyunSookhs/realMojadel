@@ -57,7 +57,6 @@ class _ChattingPageState extends State<ChattingPage> {
       }
     }
   }
-
   Future<void> createOrJoinChatRoom() async {
     String chatRoomId = widget.title;
     try {
@@ -78,18 +77,21 @@ class _ChattingPageState extends State<ChattingPage> {
           }
         }
       } else {
-        // If chat room does not exist, create it
-        await chatRoomRef.set({
-          'chatRoomId': chatRoomId,
-          'writerNickname': widget.writerNickname,
-          'title': widget.title,
-          'price': widget.price,
-          'boardImageList': widget.boardImageList,
-          'participants': {
-            'buyer': currentUserNickname!,
-            'seller': widget.writerNickname,
-          }
-        });
+        // If chat room does not exist and current user is not the writer
+        if (currentUserNickname != widget.writerNickname) {
+          // Create a new chat room
+          await chatRoomRef.set({
+            'chatRoomId': chatRoomId,
+            'writerNickname': widget.writerNickname,
+            'title': widget.title,
+            'price': widget.price,
+            'boardImageList': widget.boardImageList,
+            'participants': {
+              'buyer': currentUserNickname!,
+              'seller': widget.writerNickname,
+            }
+          });
+        }
       }
       setState(() {
         messagesCollection = chatRoomRef.collection('messages');
@@ -98,7 +100,6 @@ class _ChattingPageState extends State<ChattingPage> {
       print('Failed to create or join chat room: $e');
     }
   }
-
 
   Future<bool> _isUserParticipant() async {
     if (currentUserNickname == null) return false;
@@ -148,16 +149,14 @@ class _ChattingPageState extends State<ChattingPage> {
     String appBarTitle;
     if (currentUserNickname == null) {
       appBarTitle = 'Chat';
-    } else if (currentUserNickname == widget.writerNickname) {
-      appBarTitle = '${widget.writerNickname}';
     } else {
-      appBarTitle = '${currentUserNickname}';
+      appBarTitle = isSeller ? '구매자' : '판매자 (${widget.writerNickname})';
     }
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
-            appBarTitle, style: TextStyle(fontWeight: FontWeight.w600),
+          appBarTitle, style: TextStyle(fontWeight: FontWeight.w600),
         ),
         backgroundColor: AppColors.mintgreen,
       ),
