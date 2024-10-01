@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mojadel2/mypage/AccountCalendar/account_calendar_home.dart';
+import 'package:mojadel2/mypage/CheckList/checklist_calendar_home.dart';
 import 'package:mojadel2/mypage/tabBar/MyBoardContents.dart';
 import 'package:mojadel2/mypage/tabBar/MyRecipeContents.dart';
 import 'package:mojadel2/mypage/tabBar/MyTradeContents.dart';
 import 'package:mojadel2/mypage/tabBar/TabbarName.dart';
+
+import 'CheckList.dart';
 
 const List<String> transactionTypes = ['중고거래', '공동구매'];
 const List<String> checkTransaction = ['거래 중', '거래 완료'];
@@ -73,24 +77,8 @@ class _TabBarUsingController2State extends State<TabBarUsingController2>
                 SingleChildScrollView(
                   child: MyRecipecontents(onRefresh: () {  },),
                 ),
-                ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text('D Item %index'),
-                    );
-                  },
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(10, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('C Content $index'),
-                      );
-                    }),
-                  ),
-                ),
+                Checklist(),
+                CalendarWidget(), // Expanded 없이 바로 사용
               ],
             ),
           ),

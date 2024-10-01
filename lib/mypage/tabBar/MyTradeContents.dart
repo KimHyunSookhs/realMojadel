@@ -188,6 +188,7 @@ class _MyTradecontentsState extends State<MyTradecontents> {
                                 ),
                               ),
                             );
+                            _fetchMyBoards();
                           },
                         ),
                         if (index != messages.length - 1) Divider(),

@@ -442,7 +442,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(5.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

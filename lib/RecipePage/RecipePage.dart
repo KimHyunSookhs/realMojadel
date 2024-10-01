@@ -442,7 +442,11 @@ class _RecipeGridState extends State<RecipeGrid> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(message.title, style: TextStyle(fontSize: 15)),
+                    Text(
+                      message.title,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               );

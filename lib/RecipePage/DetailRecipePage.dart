@@ -520,7 +520,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                               child: Text(
@@ -532,7 +532,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                               ingredient.split(' - ')[1],
                               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                             ),
-                            SizedBox(width: 200,)
+                            SizedBox(width: 100,)
                           ],
                         ),
                       ),
@@ -542,7 +542,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(15.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.0),
@@ -578,14 +578,14 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                               Expanded(
                                 child: Text(
                                   '${i + 1}. ${stepContents[i]}',
-                                  style: TextStyle(fontSize: 20, color: Colors.black),
+                                  style: TextStyle(fontSize: 13, color: Colors.black),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               if (stepImages[i].isNotEmpty)
                                 Container(
-                                  width: 100,
-                                  height: 100,
+                                  width: 90,
+                                  height: 90,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.rectangle,
                                     borderRadius: BorderRadius.circular(12.0),

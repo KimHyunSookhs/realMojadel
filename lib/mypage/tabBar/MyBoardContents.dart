@@ -184,6 +184,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
                                 ),
                               ),
                             );
+                            _fetchMyBoards();
                           },
                         ),
                         if (index != messages.length - 1) Divider(),

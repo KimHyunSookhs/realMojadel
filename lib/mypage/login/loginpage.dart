@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mojadel2/mypage/tabBar/TabBarList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../colors/colors.dart';
 
@@ -13,9 +14,13 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  late TabController _tabController;
 
   String? _jwtToken;
-
+  @override
+  void initState() {
+    super.initState();
+  }
   Future<String?> _getJwtToken(String email, String password) async {
     final String uri = 'http://10.0.2.2:4000/api/v1/auth/sign-in';
     final Map<String, String> headers = {
@@ -87,8 +92,6 @@ class _LogInPageState extends State<LogInPage> {
                     prefs.setString('jwtToken', jwtToken);
                     prefs.setString('userEmail', email);
                     Navigator.pop(context, jwtToken);
-                    setState(() {
-                    });
                   }
                      else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,7 +100,9 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                       );
                   }
+                  TabBarUsingController2();
                 },
+
                 child: Text('로그인'),
               ),
               if (_jwtToken != null)

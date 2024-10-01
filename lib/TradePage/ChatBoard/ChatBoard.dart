@@ -75,7 +75,7 @@ class _ChatBoardPageState extends State<ChatBoardPage> {
         backgroundColor: AppColors.mintgreen,
       ),
       body: currentUserNickname == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child:Text('로그인 후 이용가능 합니다'))
           : FutureBuilder<List<DocumentSnapshot>>(
         future: getUserChatRooms(currentUserNickname!),
         builder: (context, snapshot) {

@@ -212,9 +212,7 @@ class _MyRecipecontentsState extends State<MyRecipecontents> {
                                 ),
                               ),
                             );
-                            if (success == true) {
-                              widget.onRefresh();
-                            }
+                            _fetchMyBoards();
                           },
                         ),
                         if (index != messages.length - 1) Divider(),

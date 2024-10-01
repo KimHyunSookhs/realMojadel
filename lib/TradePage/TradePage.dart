@@ -79,29 +79,28 @@ class _MainhomePageState extends State<MainhomePage> {
               if (data['boardTitleImage'] != null) {
                 if (data['boardTitleImage'] is String) {
                   boardTitleImageList = [data['boardTitleImage']];
-                } else {
+                } else if (data['boardTitleImage'] is List) {
                   boardTitleImageList = List<String>.from(data['boardTitleImage']);
                 }
               }
               messages.add(
                 TradeBoardListItem(
-                  data['boardNumber'],
-                  data['title'],
-                  data['content'],
+                  data['boardNumber'] ?? 0,
+                  data['title'] ?? '',
+                  data['content'] ?? '',
                   boardTitleImageList,
                   data['favoriteCount'] ?? 0,
                   data['commentCount'] ?? 0,
                   data['viewCount'] ?? 0,
                   data['writeDatetime'] ?? '',
-                  data['tradeLocation']?? '',
-                  data['price']?? '',
-                  data['writerNickname'],
-                  data['writerProfileImage'],
+                  data['tradeLocation'] ?? '',
+                  data['price'] ?? '0',
+                  data['writerNickname'] ?? '',
+                  data['writerProfileImage'] ?? '',
                 ),
               );
               await checkTradeCompletionStatus(data['boardNumber']);
             }
-
             messages.sort((a, b) {
               bool aCompleted = _tradeCompletionStatus[a.boardNumber] ?? false;
               bool bCompleted = _tradeCompletionStatus[b.boardNumber] ?? false;
@@ -153,19 +152,11 @@ class _MainhomePageState extends State<MainhomePage> {
           List<TradeBoardListItem> searchResults = [];
           for (var data in searchList) {
             List<String> boardTitleImageList = [];
-            List<String> writerProfileImage = [];
             if (data['boardTitleImage'] != null) {
               if (data['boardTitleImage'] is String) {
                 boardTitleImageList = [data['boardTitleImage']];
               } else {
                 boardTitleImageList = List<String>.from(data['boardTitleImage']);
-              }
-            }
-            if (data['writerProfileImage'] != null) {
-              if (data['writerProfileImage'] is String) {
-                writerProfileImage = [data['writerProfileImage']];
-              } else {
-                writerProfileImage = List<String>.from(data['writerProfileImage']);
               }
             }
             searchResults.add(

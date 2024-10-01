@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mojadel2/mypage/propfileChange/propfileChange.dart';
+import 'package:mojadel2/mypage/tabBar/TabBarList.dart';
 import '../login/loginpage.dart';
 import '../signup/signup.dart';
 
@@ -31,6 +32,7 @@ class OptionMenu extends StatelessWidget {
           if (jwtToken != null) {
             updateJwtToken(jwtToken);
             loadUserInfo();
+            TabBarUsingController2();
           }
         });
       } else if (value == 'signup') {

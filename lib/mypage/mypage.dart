@@ -69,8 +69,6 @@ class _MyPageSiteState extends State<MyPageSite>
           setState(() {
             _profileImageUrl = imageUrl;
           });
-        } else {
-          print('Failed to upload image: ${response.statusCode}');
         }
       } catch (e) {
         print('Failed to upload image: $e');
@@ -129,7 +127,7 @@ class _MyPageSiteState extends State<MyPageSite>
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -142,7 +140,7 @@ class _MyPageSiteState extends State<MyPageSite>
                       ),
                     ),
                     child: CircleAvatar(
-                      radius: 50,
+                      radius: 45,
                       backgroundColor: Colors.white10,
                       backgroundImage: _profileImageUrl != null
                           ? (_profileImageUrl!.startsWith('http')
@@ -182,7 +180,7 @@ class _MyPageSiteState extends State<MyPageSite>
             ),
             Divider(),
             Container(
-              height: 400,  // Provide a fixed height or adjust according to your layout
+              height: 500,
               child: TabBarUsingController2(),
             ),
           ],
