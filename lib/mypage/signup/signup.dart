@@ -119,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   );
                   String requestBody = json.encode(user.toJson());
 
-                  String uri = 'http://10.0.2.2:4000/api/v1/auth/sign-up';
+                  String uri = 'http://192.168.219.109:4000/api/v1/auth/sign-up';
                   try {
                     final response = await http.post(Uri.parse(uri),
                       headers: <String, String>{

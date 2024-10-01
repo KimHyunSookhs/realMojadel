@@ -67,7 +67,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,7 +150,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
+        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail,
@@ -181,7 +181,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -213,7 +213,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
+        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content,
@@ -237,7 +237,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -264,7 +264,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
   Future<void> deleteComment(int commentNumber) async {
     final String uri =
-        'http://10.0.2.2:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -284,7 +284,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -308,7 +308,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> deleteRecipeBoard() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -461,23 +461,23 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     mainContent,
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 18,),
+                  SizedBox(height: 14,),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(Icons.timer_sharp, size: 18,color: Colors.grey,),
                       Text(
                         '$cookingTime', style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey,
                       ),
@@ -693,12 +693,12 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                           Text(
                             formatDatetime(comments[index].writeDatetime ?? ''), // 작성 시간
                             style: TextStyle(
-                                fontSize: 10, color: Colors.grey),
+                                fontSize: 9, color: Colors.grey),
                           ),
                           SizedBox(height: 5),
                           Text(
                             comments[index].content ?? '', // 댓글 내용
-                            style: TextStyle(fontSize: 15),
+                            style: TextStyle(fontSize: 10),
                           ),
                         ],
                       ),
@@ -719,7 +719,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                               : FileImage(File(comments[index].profileImage!)) as ImageProvider)
                               : null,
                           child: comments[index].profileImage == null
-                              ? Icon(Icons.person, size: 50)
+                              ? Icon(Icons.person, size: 30)
                               : null,
                         ),
                       ),

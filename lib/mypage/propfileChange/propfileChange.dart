@@ -66,7 +66,7 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/user/profile-image');
+        Uri url = Uri.parse('http://192.168.219.109:4000/api/v1/user/profile-image');
         http.Response response = await http.patch(
           url,
           headers: headers,

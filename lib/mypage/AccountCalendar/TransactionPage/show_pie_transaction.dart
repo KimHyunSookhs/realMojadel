@@ -31,8 +31,6 @@ class ShowPieTransaction extends StatelessWidget {
         print('Date Mismatch: $transactionDate'); // Log if date doesn't match
       }
     });
-    print('Category Sums for type $type: $categorySums'); // Debugging
-    print('${selectedDate}');
     return categorySums;
   }
 
@@ -78,8 +76,6 @@ class ShowPieTransaction extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, double> incomeSums = calculateCategorySums(0); // Income
     Map<String, double> expenseSums = calculateCategorySums(1); // Expenses
-    print('Income Sums: $incomeSums');
-    print('Expense Sums: $expenseSums');
     return Column(
       children: [
         Text(

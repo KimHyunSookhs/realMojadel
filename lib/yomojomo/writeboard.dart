@@ -39,7 +39,7 @@ class _WriteBoardState extends State<WriteBoard> {
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
     String content = _contentController.text;
-    final String uri = 'http://10.0.2.2:4000/api/v1/community/board';
+    final String uri = 'http://192.168.219.109:4000/api/v1/community/board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',

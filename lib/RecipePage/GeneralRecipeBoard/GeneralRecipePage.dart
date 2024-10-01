@@ -39,7 +39,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
   }
 
   Future<void> fetchRecipeBoard() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/latest-list/0';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/latest-list/0';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -170,8 +170,8 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: double.infinity,
-                          height: 150,
+                          width: 150,
+                          height: 130,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black, width: 0.5),
                             image: DecorationImage(
@@ -183,7 +183,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                         SizedBox(height: 5),
                         Text(
                           message.title,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

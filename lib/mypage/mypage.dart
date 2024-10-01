@@ -58,7 +58,7 @@ class _MyPageSiteState extends State<MyPageSite>
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/user/profile-image');
+        Uri url = Uri.parse('http://192.168.219.109:4000/api/v1/user/profile-image');
         http.Response response = await http.patch(
           url,
           headers: headers,
@@ -154,7 +154,7 @@ class _MyPageSiteState extends State<MyPageSite>
                     children: [
                       Text(
                         _nickname ?? '비회원',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 6,),
                       Container(

@@ -52,7 +52,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://10.0.2.2:4000/api/v1/community/board/user-board-list/$userEmail';
+        'http://192.168.219.109:4000/api/v1/community/board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -143,7 +143,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
                               Expanded(
                                 child: Text(
                                   message.content,
-                                  style: TextStyle(fontSize: 15),
+                                  style: TextStyle(fontSize: 14),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -154,21 +154,21 @@ class _MyboardcontentsState extends State<Myboardcontents> {
                                   SizedBox(width: 4),
                                   Text(
                                     '${message.favoriteCount}',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(fontSize: 10),
                                   ),
                                   SizedBox(width: 4),
                                   Icon(Icons.comment),
                                   SizedBox(width: 4),
                                   Text(
                                     '${message.commentCount}',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(fontSize: 10),
                                   ),
                                   SizedBox(width: 4),
                                   Icon(Icons.remove_red_eye),
                                   SizedBox(width: 4),
                                   Text(
                                     '${message.viewCount}',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(fontSize: 10),
                                   ),
                                 ],
                               ),

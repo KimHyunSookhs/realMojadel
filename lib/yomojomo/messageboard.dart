@@ -29,7 +29,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _fetchMessages() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/latest-list';
+    final String uri = 'http://192.168.219.109:4000/api/v1/community/board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -111,7 +111,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/search-list/$searchWord';
+    final String uri = 'http://192.168.219.109:4000/api/v1/community/board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -211,7 +211,7 @@ class _MessageBoardState extends State<MessageBoard> {
                         title: Text(
                           message.title,
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'NotoSansKR',
                           ),
@@ -221,7 +221,7 @@ class _MessageBoardState extends State<MessageBoard> {
                             Expanded(
                               child: Text(
                                 message.content,
-                                style: TextStyle(fontSize: 17),
+                                style: TextStyle(fontSize: 13),
                                 maxLines: 1, // 최대 1줄로 제한
                                 overflow: TextOverflow.ellipsis, // 글자수가 초과되면 "..."으로 축약
                               ),
@@ -229,24 +229,24 @@ class _MessageBoardState extends State<MessageBoard> {
                             Row(
                               children: [
                                 Icon(Icons.favorite),
-                                SizedBox(width: 4),
+                                SizedBox(width: 2),
                                 Text(
                                   '${message.favoriteCount}',
-                                  style: TextStyle(fontSize: 14),
+                                  style: TextStyle(fontSize: 12),
                                 ),
-                                SizedBox(width: 4),
+                                SizedBox(width: 2),
                                 Icon(Icons.comment),
-                                SizedBox(width: 4),
+                                SizedBox(width: 2),
                                 Text(
                                   '${message.commentCount}',
-                                  style: TextStyle(fontSize: 14),
+                                  style: TextStyle(fontSize: 12),
                                 ),
-                                SizedBox(width: 4),
-                                Icon(Icons.remove_red_eye),
-                                SizedBox(width: 4),
+                                SizedBox(width: 2),
+                                Icon(Icons.remove_red_eye,),
+                                SizedBox(width: 2),
                                 Text(
                                   '${message.viewCount}',
-                                  style: TextStyle(fontSize: 14),
+                                  style: TextStyle(fontSize: 12),
                                 ),
                               ],
                             ),

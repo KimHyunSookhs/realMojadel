@@ -29,22 +29,22 @@ class DayWidget extends StatelessWidget {
         margin: EdgeInsets.all(1.0),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(6.0),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               '${day['day']}',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
             ),
             Text(
               '$totalIncome',
-              style: TextStyle(color: Colors.indigoAccent, fontSize: 10,fontWeight:FontWeight.w600),
+              style: TextStyle(color: Colors.indigoAccent, fontSize: 8,fontWeight:FontWeight.w600),
             ),
             Text(
               '$totalExpense',
-              style: TextStyle(color: Colors.red, fontSize: 10,fontWeight:FontWeight.w700),
+              style: TextStyle(color: Colors.red, fontSize: 8,fontWeight:FontWeight.w700),
             ),
           ],
         ),

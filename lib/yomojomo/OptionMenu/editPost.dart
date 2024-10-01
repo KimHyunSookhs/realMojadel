@@ -40,7 +40,7 @@ class _EditPostState extends State<EditPost> {
   }
 
   Future<void> _patchPost() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}';
+    final String uri = 'http://192.168.219.109:4000/api/v1/community/board/${widget.postId}';
     try {
       final prefs = await SharedPreferences.getInstance();
       final jwtToken = prefs.getString('jwtToken');

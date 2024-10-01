@@ -22,7 +22,7 @@ class _LogInPageState extends State<LogInPage> {
     super.initState();
   }
   Future<String?> _getJwtToken(String email, String password) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/auth/sign-in';
+    final String uri = 'http://192.168.219.109:4000/api/v1/auth/sign-in';
     final Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };

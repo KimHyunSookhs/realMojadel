@@ -53,7 +53,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
   Future<void> fetchTransactions(DateTime selectedDate) async {
     final String formattedDateTime = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String uri = 'http://10.0.2.2:4000/api/v1/account-log/day?datetime=$formattedDateTime';
+    final String uri = 'http://192.168.219.109:4000/api/v1/account-log/day?datetime=$formattedDateTime';
     try {
       final response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -141,7 +141,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
 
   Future<void> _updateTransaction(String accountLogNumber, String category, String description, int amount, int type) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/account-log/$accountLogNumber';
+    final String uri = 'http://192.168.219.109:4000/api/v1/account-log/$accountLogNumber';
     final body = json.encode({
       "content": description,
       "type": type, // Now it is an int (0 or 1)
@@ -193,7 +193,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
 
   Future<void> _deleteTransaction(String accountLogNumber) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/account-log/$accountLogNumber';
+    final String uri = 'http://192.168.219.109:4000/api/v1/account-log/$accountLogNumber';
     try {
       final response = await http.delete(
         Uri.parse(uri),

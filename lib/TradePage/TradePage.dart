@@ -65,7 +65,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/latest-list';
+    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -140,7 +140,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -263,8 +263,8 @@ class _MainhomePageState extends State<MainhomePage> {
                           child: Row(
                             children: [
                               Container(
-                                width: 100,
-                                height: 100,
+                                width: 80,
+                                height: 90,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.black, width: 0.5), // 실선 테두리 추가
                                   image: DecorationImage(
@@ -283,13 +283,13 @@ class _MainhomePageState extends State<MainhomePage> {
                                       children: [
                                         Text(
                                           message.title,
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                                         ),
                                         if (_tradeCompletionStatus[message.boardNumber] == true) ...[
                                           Text(
                                             '거래완료',
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: 11,
                                               color: Colors.red,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -300,7 +300,7 @@ class _MainhomePageState extends State<MainhomePage> {
                                     Row(
                                       children: [
                                         Text('${message.tradeLocation}'),
-                                        SizedBox(width: 8),
+                                        SizedBox(width: 6),
                                         Text(formatDatetime('${message.writeDatetime}')),
                                       ],
                                     ),
@@ -313,14 +313,14 @@ class _MainhomePageState extends State<MainhomePage> {
                                         SizedBox(width: 4),
                                         Text(
                                           '${message.favoriteCount}',
-                                          style: TextStyle(fontSize: 14),
+                                          style: TextStyle(fontSize: 12),
                                         ),
                                         SizedBox(width: 4),
                                         Icon(Icons.comment),
                                         SizedBox(width: 4),
                                         Text(
                                           '${message.commentCount}',
-                                          style: TextStyle(fontSize: 14),
+                                          style: TextStyle(fontSize: 12),
                                         ),
                                       ],
                                     ),

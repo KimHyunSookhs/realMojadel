@@ -77,7 +77,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipeBoard(int type, StreamController<List<RecipeBoardListItem>> streamController, Function(List<RecipeBoardListItem>) onSuccess) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/latest-list/$type';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/latest-list/$type';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -103,7 +103,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,8 +150,8 @@ class _RecipePageState extends State<RecipePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 130,
-                  height: 130,
+                  width: 100,
+                  height: 120,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 0.3),
                     borderRadius: BorderRadius.circular(8),
@@ -166,12 +166,12 @@ class _RecipePageState extends State<RecipePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 12),
+                      SizedBox(height: 8),
                       Text(
                         item.title,
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
@@ -183,10 +183,10 @@ class _RecipePageState extends State<RecipePage> {
                         overflow: TextOverflow.ellipsis,
                         softWrap: true,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 10,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 5),
                       Row(
                         children: [
                           Icon(Icons.favorite, size: 16, color: Colors.red),
@@ -214,11 +214,11 @@ class _RecipePageState extends State<RecipePage> {
                             Text(
                               '${item.cookingTime}',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                             ),
                             Text('분', style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                             ),),
                           ],
                         ),
@@ -428,8 +428,8 @@ class _RecipeGridState extends State<RecipeGrid> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 180,
-                      height: 150,
+                      width: 160,
+                      height: 140,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 0.3),
                         image: message.boardTitleImage
@@ -444,7 +444,7 @@ class _RecipeGridState extends State<RecipeGrid> {
                     SizedBox(height: 5),
                     Text(
                       message.title,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

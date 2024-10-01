@@ -51,7 +51,7 @@ class _RegistarPageState extends State<RegistarPage> {
     String content = _contentController.text;
     String tradeLocation = _locationController.text;
     String price = _priceController.text;
-    final String uri = 'http://10.0.2.2:4000/api/v1/trade/trade-board';
+    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',

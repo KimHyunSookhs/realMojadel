@@ -154,7 +154,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
       String stepImageString = _steps[i]['image'] ?? '';
       stepImages.add(stepImageString);
     }
-    final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -246,10 +246,10 @@ class _EditRecipePageState extends State<EditRecipePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 30,
+          width: 20,
           height: 50,
           alignment: Alignment.center,
-          child: Text('${index + 1}', style: TextStyle(fontSize: 20)),
+          child: Text('${index + 1}', style: TextStyle(fontSize: 16)),
         ),
         Expanded(
           flex: 3,
@@ -258,6 +258,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
             decoration: InputDecoration(hintText: '요리 순서를 입력하세요'),
             minLines: 1,
             maxLines: 2,
+            style: TextStyle(fontSize: 13),
           ),
         ),
         SizedBox(width: 10),

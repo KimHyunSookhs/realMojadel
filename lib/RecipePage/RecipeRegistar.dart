@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -76,7 +77,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       for (int i = 0; i < _steps.length; i++) {
         stepContents.add(_steps[i]['text'].text.trim());
       }
-      final String uri = 'http://10.0.2.2:4000/api/v1/recipe/recipe-board';
+      final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board';
       Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_jwtToken',
@@ -309,7 +310,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
                     });
                   },
                 ),
-                const Text('일반레시피'),
+                const Text('일반레시피',style:TextStyle(fontSize: 12)),
               ],
             ),
           ),
@@ -326,11 +327,11 @@ class _RecipeRegistar extends State<RecipeRegistar> {
                     });
                   },
                 ),
-                const Text('편의점레시피'),
+                const Text('편의점레시피',style:TextStyle(fontSize: 12)),
               ],
             ),
           ),
-          SizedBox(width: 10,),
+          SizedBox(width: 5,),
           Expanded(
             flex: 1,
             child: Row(
@@ -341,7 +342,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 15.0),
+                          vertical: 5.0, horizontal: 10.0),
                       isDense: true,
                     ),
                     onChanged: (value) {

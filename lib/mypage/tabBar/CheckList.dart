@@ -55,12 +55,12 @@ class _ChecklistState extends State<Checklist> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('자취방 체크리스트', style: TextStyle(
-          fontSize: 24, fontWeight:FontWeight.w500
+          fontSize: 24, fontWeight:FontWeight.w500,
         ),),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -92,12 +92,12 @@ class _ChecklistState extends State<Checklist> {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         ...checklist.keys.map((item) => CheckboxListTile(
-          title: Text(item),
+          title: Text(item, style: TextStyle(fontSize: 13),),
           value: checklist[item],
           onChanged: (bool? value) {
             setState(() {
