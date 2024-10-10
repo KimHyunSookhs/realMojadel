@@ -39,7 +39,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
   }
 
   Future<void> fetchRecipeBoard() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/latest-list/0';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/latest-list/0';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -50,7 +50,6 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
             List<RecipeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
-              List<String> writerProfileImage = [];
               List<String> step1_image = [];
               List<String> step2_image = [];
               List<String> step3_image = [];
@@ -66,13 +65,6 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                   boardTitleImageList = List<String>.from(data['boardTitleImage']);
                 }
               }
-              if (data['writerProfileImage'] != null) {
-                if (data['writerProfileImage'] is String) {
-                  writerProfileImage = [data['writerProfileImage']];
-                } else {
-                  writerProfileImage = List<String>.from(data['writerProfileImage']);
-                }
-              }
               messages.add(
                 RecipeBoardListItem(
                   boardNumber: data['boardNumber'],
@@ -84,7 +76,7 @@ class _GeneralRecipePageState extends State<GeneralRecipePage> {
                   viewCount: data['viewCount'] ?? 0,
                   writeDatetime: data['writeDatetime'] ?? '',
                   writerNickname: data['writerNickname'],
-                  writerProfileImage: data['writerProfileImage'],
+                  writerProfileImage: data['writerProfileImage']?? '',
                   type: data['type'],
                   cookingTime: data['cookingTime'],
                   step1_content: data['step1_content']??'',

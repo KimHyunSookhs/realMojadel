@@ -55,7 +55,7 @@ class _MyRecipecontentsState extends State<MyRecipecontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
+        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -94,7 +94,7 @@ class _MyRecipecontentsState extends State<MyRecipecontents> {
                 viewCount: data['viewCount'] ?? 0,
                 writeDatetime: data['writeDatetime'] ?? '',
                 writerNickname: data['writerNickname'],
-                writerProfileImage: data['writerProfileImage'],
+                writerProfileImage: data['writerProfileImage']?? '',
                 type: data['type'],
                 cookingTime: data['cookingTime'],
                 step1_content: data['step1_content'] ?? '',

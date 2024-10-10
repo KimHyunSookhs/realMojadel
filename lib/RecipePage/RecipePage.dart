@@ -62,22 +62,24 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipes() async {
-    await Future.wait([
-      fetchRecipeBoard(0, _generalRecipeStreamController, (recipes) {
-        setState(() {
-          _generalRecipes = recipes;
-        });
-      }),
-      fetchRecipeBoard(1, _convenienceStoreRecipeStreamController, (recipes) {
-        setState(() {
-          _convenienceStoreRecipes = recipes;
-        });
-      }),
-    ]);
+    try {
+      await Future.wait([
+        fetchRecipeBoard(0, _generalRecipeStreamController, (recipes) {
+          setState(() {
+            _generalRecipes = recipes;
+          });
+        }),
+        fetchRecipeBoard(1, _convenienceStoreRecipeStreamController, (recipes) {
+          setState(() {
+            _convenienceStoreRecipes = recipes;
+          });
+        }),
+      ]);
+    } catch (error) {    }
   }
 
   Future<void> fetchRecipeBoard(int type, StreamController<List<RecipeBoardListItem>> streamController, Function(List<RecipeBoardListItem>) onSuccess) async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/latest-list/$type';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/latest-list/$type';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -103,7 +105,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -238,7 +240,6 @@ class _RecipePageState extends State<RecipePage> {
     List<RecipeBoardListItem> messages = [];
     for (var data in dataList) {
       List<String> boardTitleImageList = _parseImageList(data['boardTitleImage']);
-      List<String> writerProfileImage = _parseImageList(data['writerProfileImage']);
       messages.add(
         RecipeBoardListItem(
           boardNumber: data['boardNumber'],
@@ -250,7 +251,7 @@ class _RecipePageState extends State<RecipePage> {
           viewCount: data['viewCount'] ?? 0,
           writeDatetime: data['writeDatetime'] ?? '',
           writerNickname: data['writerNickname'],
-          writerProfileImage: data['writerProfileImage'],
+          writerProfileImage: data['writerProfileImage']?? '',
           type: data['type'],
           cookingTime: data['cookingTime'],
           step1_content: data['step1_content']??'',

@@ -48,7 +48,7 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
   }
 
   Future<void> fetchRecipeBoard() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/latest-list/1';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/latest-list/1';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -87,7 +87,7 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
                   viewCount: data['viewCount'] ?? 0,
                   writeDatetime: data['writeDatetime'] ?? '',
                   writerNickname: data['writerNickname'],
-                  writerProfileImage: data['writerProfileImage'],
+                  writerProfileImage: data['writerProfileImage']?? '',
                   type: data['type'],
                   cookingTime: data['cookingTime'],
                   step1_content: data['step1_content']??'',

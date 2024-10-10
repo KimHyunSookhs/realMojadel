@@ -29,7 +29,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _fetchMessages() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/community/board/latest-list';
+    final String uri = 'http://52.79.217.191:4000/api/v1/community/board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -41,11 +41,11 @@ class _MessageBoardState extends State<MessageBoard> {
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
               if (data['boardTitleImage'] != null) {
-                if (data['boardTitleImage'] is String) {
-                  boardTitleImageList = [data['boardTitleImage']];
-                } else {
-                  boardTitleImageList = List<String>.from(data['boardTitleImage']);
-                }
+              if (data['boardTitleImage'] is String) {
+              boardTitleImageList = [data['boardTitleImage']];
+              } else if (data['boardTitleImage'] is List) {
+              boardTitleImageList = List<String>.from(data['boardTitleImage']);
+              }
               }
               messages.add(
                 TradeBoardListItem(
@@ -58,7 +58,7 @@ class _MessageBoardState extends State<MessageBoard> {
                   data['viewCount'] ?? 0,
                   data['writeDatetime'] ?? '',
                   data['writerNickname'] ?? '',
-                  data['writerProfileImage'],
+                  data['writerProfileImage'] ?? '',
                 ),
               );
             }
@@ -111,7 +111,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/community/board/search-list/$searchWord';
+    final String uri = 'http://52.79.217.191:4000/api/v1/community/board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -141,7 +141,7 @@ class _MessageBoardState extends State<MessageBoard> {
                 data['viewCount'] ?? 0,
                 data['writeDatetime'] ?? '',
                 data['writerNickname'] ?? '',
-                data['writerProfileImage'],
+                data['writerProfileImage']?? '',
               ),
             );
           }

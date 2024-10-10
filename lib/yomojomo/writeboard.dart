@@ -39,7 +39,7 @@ class _WriteBoardState extends State<WriteBoard> {
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
     String content = _contentController.text;
-    final String uri = 'http://192.168.219.109:4000/api/v1/community/board';
+    final String uri = 'http://52.79.217.191:4000/api/v1/community/board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -58,25 +58,33 @@ class _WriteBoardState extends State<WriteBoard> {
         body: requestBody,
       );
       if (response.statusCode == 200) {
-        print('The post has been successfully submitted.');
-        Navigator.of(context).pop(true);
-      } else {
-        print('Failed to submit the post. Error code: ${response.statusCode}');
+        if (context.mounted) {
+          Navigator.of(context).pop(true);
+        }
       }
     } catch (error) {
-      print('An error occurred while submitting the post: $error');
     }
   }
-
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      String imagePath = await saveImagePermanently(File(pickedFile.path));
       setState(() {
-        _boardImageList.add(imagePath);
+        _boardImageList.add(pickedFile.path); // Just add the local path to the list
       });
+    } else {
+      print('No image selected.');
     }
   }
+
+  // Future<void> getImage(ImageSource imageSource) async {
+  //   final XFile? pickedFile = await picker.pickImage(source: imageSource);
+  //   if (pickedFile != null) {
+  //     String imagePath = await saveImagePermanently(File(pickedFile.path));
+  //     setState(() {
+  //       _boardImageList.add(imagePath);
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

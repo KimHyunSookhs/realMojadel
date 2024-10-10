@@ -46,7 +46,7 @@ class _EditTradeState extends State<EditTradePage> {
     }
   }
   Future<void> _patchTrade() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board/${widget.tradeId}';
+    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       final prefs = await SharedPreferences.getInstance();
       final jwtToken = prefs.getString('jwtToken');

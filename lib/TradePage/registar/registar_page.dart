@@ -51,7 +51,7 @@ class _RegistarPageState extends State<RegistarPage> {
     String content = _contentController.text;
     String tradeLocation = _locationController.text;
     String price = _priceController.text;
-    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board';
+    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -72,10 +72,9 @@ class _RegistarPageState extends State<RegistarPage> {
         body: requestBody,
       );
       if (response.statusCode == 200) {
-        print('The tradepost has been successfully submitted.');
-        Navigator.of(context).pop(true);
-      } else {
-        print('Failed to submit the post. Error code: ${response.statusCode}');
+        if (context.mounted) {
+          Navigator.of(context).pop(true);
+        }
       }
     } catch (error) {
       print('An error occurred while submitting the post: $error');

@@ -58,7 +58,7 @@ class _MyPageSiteState extends State<MyPageSite>
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://192.168.219.109:4000/api/v1/user/profile-image');
+        Uri url = Uri.parse('http://52.79.217.191:4000/api/v1/user/profile-image');
         http.Response response = await http.patch(
           url,
           headers: headers,

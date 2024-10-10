@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<int?> getUserRecipePostsCount(String userEmail, String jwtToken, String? nickname) async {
-  final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
+  final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
   final Map<String, String> headers = {
     'Authorization': 'Bearer $jwtToken',
   };

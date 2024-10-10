@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mojadel2/Comment/commentList.dart';
 
 Future<void> postComment(int postId, String content, String jwtToken) async {
-  final String uri = 'http://192.168.219.109:4000/api/v1/community/board/$postId/comment';
+  final String uri = 'http://52.79.217.191:4000/api/v1/community/board/$postId/comment';
   try {
     final Map<String, dynamic> requestBody = {
       'content': content,
@@ -36,7 +36,7 @@ Future<void> postComment(int postId, String content, String jwtToken) async {
 }
 
 Future<void> fetchComments(int postId, String jwtToken) async {
-  final String uri = 'http://192.168.219.109:4000/api/v1/community/board/$postId/comment-list';
+  final String uri = 'http://52.79.217.191:4000/api/v1/community/board/$postId/comment-list';
   try {
     http.Response response = await http.get(Uri.parse(uri), headers: {
       'Authorization': 'Bearer $jwtToken',

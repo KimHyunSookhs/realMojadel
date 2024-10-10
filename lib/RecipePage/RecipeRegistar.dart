@@ -39,11 +39,6 @@ class _RecipeRegistar extends State<RecipeRegistar> {
   RecipeType? _recipeType = RecipeType.Recipe;
   int? type;
   int? cookingTime;
-  List<Map<String, String>> _ingredients = [
-    {'name': '', 'amount': ''},
-    {'name': '', 'amount': ''},
-    {'name': '', 'amount': ''}
-  ];
 
   @override
   void initState() {
@@ -65,19 +60,13 @@ class _RecipeRegistar extends State<RecipeRegistar> {
 
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
-    String mainContent = _contentController.text;
+    String content = _contentController.text;
     type = _recipeType == RecipeType.Recipe ? 0 : 1;
-    String content = '$mainContent\n\n재료:\n';
     List<String> stepContents = [];
-    for (var ingredient in _ingredients) {
-      if (ingredient['name']!.isNotEmpty && ingredient['amount']!.isNotEmpty) {
-        content += '${ingredient['name']} - ${ingredient['amount']}';
-      }
-    }
       for (int i = 0; i < _steps.length; i++) {
         stepContents.add(_steps[i]['text'].text.trim());
       }
-      final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board';
+      final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board';
       Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_jwtToken',
@@ -113,11 +102,9 @@ class _RecipeRegistar extends State<RecipeRegistar> {
           body: requestBody,
         );
         if (response.statusCode == 200) {
-          Navigator.of(context).pop(true);
-        } else {
-          print(
-              'Failed to submit the post. Error code: ${response.statusCode}');
-          print('Response body: ${response.body}');
+          if (context.mounted) {
+            Navigator.of(context).pop(true);
+          }
         }
       } catch (error) {
         print('An error occurred while submitting the post: $error');
@@ -171,16 +158,6 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       }
     }
 
-    void _addIngredient() {
-      setState(() {
-        _ingredients.add({'name': '', 'amount': ''});
-      });
-    }
-    void _removeIngredient(int index) {
-      setState(() {
-        _ingredients.removeAt(index);
-      });
-    }
     void _addStep() {
       if (_steps.length < 8) {
         setState(() {
@@ -230,40 +207,6 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       );
     }
 
-    Widget _buildIngredientField(int index) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: TextField(
-              decoration: InputDecoration(hintText: '예)돼지고기'),
-              onChanged: (value) {
-                setState(() {
-                  _ingredients[index]['name'] = value;
-                });
-              },
-            ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(hintText: '예)300g'),
-              onChanged: (value) {
-                setState(() {
-                  _ingredients[index]['amount'] = value;
-                });
-              },
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.clear),
-            onPressed: () {
-              _removeIngredient(index);
-            },
-          ),
-        ],
-      );
-    }
     Widget _buildPhotoArea() {
       return GestureDetector(
         onTap: () {
@@ -520,37 +463,6 @@ class _RecipeRegistar extends State<RecipeRegistar> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: _buildCategoryAndCookingTimeField(),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2,),
-                    Container(
-                      color: AppColors.mintgreen,
-                      width: double.infinity,
-                      child: Text(
-                          '  재료',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                          )
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                      child: Column(
-                        children: _ingredients
-                            .asMap()
-                            .entries
-                            .map((entry) => _buildIngredientField(entry.key))
-                            .toList(),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          child: Icon(Icons.add),
-                          onPressed: _addIngredient,
                         ),
                       ],
                     ),

@@ -65,7 +65,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board/latest-list';
+    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -124,7 +124,6 @@ class _MainhomePageState extends State<MainhomePage> {
     }
   }
 
-
   void _startSearch() {
     setState(() {
       _isSearching = true;
@@ -140,7 +139,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -172,7 +171,7 @@ class _MainhomePageState extends State<MainhomePage> {
                 data['tradeLocation']?? '',
                 data['price']?? '',
                 data['writerNickname'],
-                data['writerProfileImage'],
+                data['writerProfileImage']?? '',
               ),
             );
           }

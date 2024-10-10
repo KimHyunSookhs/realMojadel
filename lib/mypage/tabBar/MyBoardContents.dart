@@ -52,7 +52,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://192.168.219.109:4000/api/v1/community/board/user-board-list/$userEmail';
+        'http://52.79.217.191:4000/api/v1/community/board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -83,7 +83,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
                 data['viewCount'] ?? 0,
                 data['writeDatetime'] ?? '',
                 data['writerNickname'] ?? '',
-                data['writerProfileImage'],
+                data['writerProfileImage']?? '',
               ),
             );
           }

@@ -67,7 +67,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,7 +150,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
+        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail,
@@ -181,7 +181,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -213,7 +213,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
+        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content,
@@ -237,7 +237,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -264,7 +264,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
   Future<void> deleteComment(int commentNumber) async {
     final String uri =
-        'http://192.168.219.109:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -284,7 +284,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -308,7 +308,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> deleteRecipeBoard() async {
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -362,7 +362,6 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     List<String> imageUrls = parseBoardImageList(boardImageList);
     List<String> contentParts = content.split('\n\n재료:\n');
     String mainContent = contentParts.isNotEmpty ? contentParts[0] : '';
-    List<String> ingredients = contentParts.length > 1 ? contentParts[1].split('\n') : [];
     List<String> stepContents = [
       step1_content, step2_content, step3_content, step4_content,
       step5_content, step6_content, step7_content, step8_content
@@ -489,53 +488,6 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                       ),)
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1.0,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '재료',  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  ),
-                  Divider(),
-                  if (ingredients.isNotEmpty)
-                    for (String ingredient in ingredients)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                ingredient.split(' - ')[0],
-                                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                              ),
-                            ),
-                            Text(
-                              ingredient.split(' - ')[1],
-                              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                            ),
-                            SizedBox(width: 100,)
-                          ],
-                        ),
-                      ),
                 ],
               ),
             ),

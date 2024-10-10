@@ -154,7 +154,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
       String stepImageString = _steps[i]['image'] ?? '';
       stepImages.add(stepImageString);
     }
-    final String uri = 'http://192.168.219.109:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
