@@ -1,9 +1,7 @@
 class TabInfo {
-  // final IconData icon;
   final String label;
 
   const TabInfo({
-    // required this.icon,
     required this.label,
   });
 }

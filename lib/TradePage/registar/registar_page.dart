@@ -13,7 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'mapcreate.dart';
-import 'package:mojadel2/Config/ImagePathProvider.dart';
 
 class RegistarPage extends StatefulWidget {
   @override
@@ -51,7 +50,7 @@ class _RegistarPageState extends State<RegistarPage> {
     String content = _contentController.text;
     String tradeLocation = _locationController.text;
     String price = _priceController.text;
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board';
+    final String uri = 'http://43.203.205.218:4000/api/v1/trade/trade-board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -81,31 +80,93 @@ class _RegistarPageState extends State<RegistarPage> {
     }
   }
 
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://43.203.205.218:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
+
+    // 이미지 파일을 Multipart로 추가
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // JWT 토큰이 있을 경우 헤더에 추가
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      // 서버에 요청 보내기
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+
+        // Check if the response is a valid JSON format
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          // If the response is an object, extract the URL
+          return jsonResponse['url']; // Adjust based on your server response structure
+        } catch (e) {
+          // If it's not JSON, return the response body directly
+          return responseBody.body; // This will be a string (URL)
+        }
+      } else {
+        throw Exception('이미지 업로드 실패');
+      }
+    } catch (error) {
+      print('Error: $error');
+      return null;
+    }
+  }
   Future<void> getImage(ImageSource imageSource) async {
     final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      String imagePath = await saveImagePermanently(File(pickedFile.path));
-      setState(() {
-        _boardImageList.add(imagePath);
-        _image = pickedFile;
-      });
+      File imageFile = File(pickedFile.path);
+
+      // 이미지를 서버로 업로드하고 URL 받기
+      String? imageUrl = await fileUploadRequest(imageFile);
+
+      if (imageUrl != null) {
+        setState(() {
+          _boardImageList.add(imageUrl);  // URL을 리스트에 추가
+        });
+      }
+    } else {
+      print('이미지 선택 안됨.');
     }
   }
 
   Widget _buildPhotoArea() {
-    return _image != null
-        ? Container(
+    return Container(
       width: 140,
       height: 120,
-      child: Image.file(File(_image!.path)),
-    )
-        : Container(
-      width: 140,
-      height: 120,
-      color: Colors.white38,
-      child: Icon(Icons.photo, size: 50, color: Colors.grey), // Placeholder icon
+      child: _boardImageList.isNotEmpty
+          ? ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _boardImageList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            width: 140,
+            height: 120,
+            margin: EdgeInsets.only(right: 5), // Add some spacing between images
+            child: Image.network(
+              _boardImageList[index],
+              fit: BoxFit.fill,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300], // Placeholder color if image fails to load
+                  child: Icon(Icons.error, color: Colors.red),
+                );
+              },
+            ),
+          );
+        },
+      )
+          : Container(
+        color: Colors.white38,
+        child: Icon(Icons.photo, size: 50, color: Colors.grey), // Placeholder icon
+      ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

@@ -27,7 +27,8 @@ class _EditPostState extends State<EditPost> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   List<String>? _boardImageList;
-  final ImagePicker _picker = ImagePicker();
+  String? _jwtToken;
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -40,7 +41,7 @@ class _EditPostState extends State<EditPost> {
   }
 
   Future<void> _patchPost() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/community/board/${widget.postId}';
+    final String uri = 'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}';
     try {
       final prefs = await SharedPreferences.getInstance();
       final jwtToken = prefs.getString('jwtToken');
@@ -72,12 +73,58 @@ class _EditPostState extends State<EditPost> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://43.203.205.218:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
+
+    // 이미지 파일을 Multipart로 추가
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // JWT 토큰이 있을 경우 헤더에 추가
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      // 서버에 요청 보내기
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+
+        // Check if the response is a valid JSON format
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          // If the response is an object, extract the URL
+          return jsonResponse['url']; // Adjust based on your server response structure
+        } catch (e) {
+          // If it's not JSON, return the response body directly
+          return responseBody.body; // This will be a string (URL)
+        }
+      } else {
+        throw Exception('이미지 업로드 실패');
+      }
+    } catch (error) {
+      print('Error: $error');
+      return null;
+    }
+  }
+
+  Future<void> getImage(ImageSource imageSource) async {
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      setState(() {
-        _boardImageList?.add(pickedFile.path); // Add the selected image to the list
-      });
+      File imageFile = File(pickedFile.path);
+
+      // 이미지를 서버로 업로드하고 URL 받기
+      String? imageUrl = await fileUploadRequest(imageFile);
+
+      if (imageUrl != null) {
+        setState(() {
+          _boardImageList?.add(imageUrl);  // URL을 리스트에 추가
+        });
+      }
+    } else {
+      print('이미지 선택 안됨.');
     }
   }
 
@@ -166,19 +213,29 @@ class _EditPostState extends State<EditPost> {
             ),
             itemCount: _boardImageList!.length,
             itemBuilder: (context, index) {
+              final imagePath = _boardImageList![index];
+              bool isNetworkImage = imagePath.startsWith('http');
+
               return Stack(
                 children: [
-                  Image.file(
-                    File(_boardImageList![index]),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
+                  isNetworkImage
+                      ? Image.network(
+                    imagePath,
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover, // Adjust how the image fits
+                  )
+                      : Image.file(
+                    File(imagePath),
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover, // Adjust how the image fits
                   ),
                   Positioned(
                     top: 5,
                     right: 5,
                     child: GestureDetector(
-                      onTap: () => _removeImage(_boardImageList![index]),
+                      onTap: () => _removeImage(imagePath),
                       child: Icon(
                         Icons.remove_circle,
                         color: Colors.red,
@@ -191,11 +248,14 @@ class _EditPostState extends State<EditPost> {
           ),
         SizedBox(height: 10),
         ElevatedButton(
-          onPressed: _pickImage,
           child: Text('이미지 추가'),
+           onPressed: () {
+    getImage(ImageSource.gallery);
+    },
           style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(AppColors.mintgreen)),
         ),
       ],
     );
   }
 }
+

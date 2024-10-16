@@ -67,7 +67,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,7 +150,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
+        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail,
@@ -181,7 +181,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -213,7 +213,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
+        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content,
@@ -237,7 +237,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -264,7 +264,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
   Future<void> deleteComment(int commentNumber) async {
     final String uri =
-        'http://52.79.217.191:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -284,7 +284,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -308,7 +308,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> deleteRecipeBoard() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -360,8 +360,6 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   @override
   Widget build(BuildContext context) {
     List<String> imageUrls = parseBoardImageList(boardImageList);
-    List<String> contentParts = content.split('\n\n재료:\n');
-    String mainContent = contentParts.isNotEmpty ? contentParts[0] : '';
     List<String> stepContents = [
       step1_content, step2_content, step3_content, step4_content,
       step5_content, step6_content, step7_content, step8_content
@@ -410,14 +408,13 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(0.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             if (imageUrls.isNotEmpty)
               Column(
                 children: [
-                  for (String imageUrl in imageUrls)
+                  if (imageUrls.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 0.5),
                       child: Container(
@@ -431,10 +428,9 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                             width: 0.3,
                           ),
                           image: DecorationImage(
-                            image: imageUrl.startsWith('http')
-                                ? NetworkImage(imageUrl)
-                                : FileImage(File(imageUrl))
-                            as ImageProvider,
+                            image: imageUrls.first.startsWith('http')
+                                ? NetworkImage(imageUrls.first)
+                                : FileImage(File(imageUrls.first)) as ImageProvider,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -466,7 +462,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    mainContent,
+                    content,
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 14,),

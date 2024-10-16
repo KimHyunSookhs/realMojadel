@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mojadel2/Config/ImagePathProvider.dart';
 import 'package:mojadel2/Config/getUserInfo.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:mojadel2/mypage/getboardcount/showBoardCounts.dart';
@@ -58,7 +57,7 @@ class _MyPageSiteState extends State<MyPageSite>
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $jwtToken',
         };
-        Uri url = Uri.parse('http://52.79.217.191:4000/api/v1/user/profile-image');
+        Uri url = Uri.parse('http://43.203.121.121:4000/api/v1/user/profile-image');
         http.Response response = await http.patch(
           url,
           headers: headers,
@@ -73,18 +72,6 @@ class _MyPageSiteState extends State<MyPageSite>
       } catch (e) {
         print('Failed to upload image: $e');
       }
-    }
-  }
-
-  Future<void> getImage(ImageSource imageSource) async {
-    final XFile? pickedFile = await picker.pickImage(source: imageSource);
-    if (pickedFile != null) {
-      String imagePath = await saveImagePermanently(File(pickedFile.path));
-      setState(() {
-        _imageFile = File(imagePath);
-        _profileImageUrl = imagePath;
-      });
-        _uploadImage(File(imagePath));
     }
   }
 

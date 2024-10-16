@@ -51,11 +51,26 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     final prefs = await SharedPreferences.getInstance();
     _jwtToken = prefs.getString('jwtToken');
   }
+  Future<void> authenticateUser(String username, String password) async {
+    final response = await http.post(
+      Uri.parse('https://your-api-url.com/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'username': username, 'password': password}),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      String token = jsonResponse['token'];
+      // JWT를 저장하거나 사용
+    } else {
+      throw Exception('Failed to authenticate user');
+    }
+  }
 
   Future<void> fetchCalendarData() async {
     final String date = '${year.toString()}-${month.toString().padLeft(
         2, '0')}';
-    final String uri = 'http://52.79.217.191:4000/api/v1/account-log/calender?datetime=$date';
+    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/calender?datetime=$date';
 
     final prefs = await SharedPreferences.getInstance();
     final jwtToken = prefs.getString('jwtToken');
@@ -96,7 +111,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       DateTime selectedDate = DateTime(year, month, day);
       final String formattedDateTime = DateFormat('yyyy-MM-dd').format(
           selectedDate);
-      final String uri = 'http://52.79.217.191:4000/api/v1/account-log/day?datetime=$formattedDateTime';
+      final String uri = 'http://43.203.121.121:4000/api/v1/account-log/day?datetime=$formattedDateTime';
 
       try {
         final response = await http.get(Uri.parse(uri), headers: {

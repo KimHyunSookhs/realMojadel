@@ -64,7 +64,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
   }
 
   Future<void> fetchTradeDetail() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -112,39 +112,47 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
 
+  Future<void> createTradeDocumentIfNotExists(int tradeId) async {
+    final tradeRef = FirebaseFirestore.instance.collection('trades').doc(tradeId.toString());
+    final tradeSnapshot = await tradeRef.get();
+    // 문서가 존재하지 않으면 생성
+    if (!tradeSnapshot.exists) {
+      await tradeRef.set({
+        'tradeId': tradeId,
+        'completed': false, // 초기 값 설정
+      });
+    }
+  }
+
   Future<void> toggleTradeCompleted() async {
-    final tradeRef = FirebaseFirestore.instance.collection('trades').doc(
-        widget.tradeId.toString());
+    await createTradeDocumentIfNotExists(widget.tradeId);
+
+    final tradeRef = FirebaseFirestore.instance.collection('trades').doc(widget.tradeId.toString());
     try {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         DocumentSnapshot tradeSnapshot = await transaction.get(tradeRef);
         if (tradeSnapshot.exists) {
           final data = tradeSnapshot.data() as Map<String, dynamic>?;
+
           if (data != null) {
             final currentCompleted = data['completed'] ?? false;
-            transaction.set(tradeRef, {'completed': !currentCompleted},
-                SetOptions(merge: true));
+            transaction.set(tradeRef, {'completed': !currentCompleted}, SetOptions(merge: true));
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    currentCompleted ? '거래 완료가 취소되었습니다' : '거래가 완료되었습니다'),
+                content: Text(currentCompleted ? '거래 완료가 취소되었습니다' : '거래가 완료되었습니다'),
               ),
             );
           }
+        } else {
+          print('문서가 존재하지 않음'); // 문서가 없을 경우
         }
       });
-    } catch (error) {
-      print('Error toggling trade completion: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('거래완료 기능에 문제가 발생했습니다: $error'),
-        ),
-      );
-    }
+    } catch (error) {    }
   }
 
-    Future<void> deleteTradeBoard() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}';
+  Future<void> deleteTradeBoard() async {
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -182,7 +190,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/comment';
+        'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content, // Add the comment text
@@ -206,7 +214,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/comment-list';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -232,7 +240,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> deleteComment(int commentNumber) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -250,7 +258,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     } catch (error) {}
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -277,7 +285,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite';
+        'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail, // 사용자 이메일 추가
@@ -308,7 +316,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite-list';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -481,10 +489,34 @@ class _DetailTradePageState extends State<DetailTradePage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            writerNickname,
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 90.0), // Add right padding to nickname
+                                child: Text(
+                                  writerNickname,
+                                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              if (writerEmail == _userEmail)
+                                TextButton(
+                                  onPressed: () {
+                                    toggleTradeCompleted();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    minimumSize: Size.zero,
+                                    padding: EdgeInsets.all(3.0),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor: Colors.black,
+                                    side: BorderSide(color: Colors.black, width: 0.3),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3.0),
+                                    ),
+                                  ),
+                                  child: Text('거래완료',style: TextStyle(fontSize: 14, color: Colors.grey),),
+                                ),
+                            ],
                           ),
                           Row(
                             children: [
@@ -492,26 +524,6 @@ class _DetailTradePageState extends State<DetailTradePage> {
                                 tradeLocation,
                                 style: TextStyle(fontSize: 14, color: Colors.grey),
                               ),
-                              SizedBox(width: 100,),
-                              if (writerEmail == _userEmail)
-                                Align(
-                                  child: TextButton(
-                                    onPressed: () {
-                                      toggleTradeCompleted();
-                                    },
-                                    style: TextButton.styleFrom(
-                                      minimumSize: Size.zero,
-                                      padding: EdgeInsets.all(3.0),
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      foregroundColor: Colors.black,
-                                      side: BorderSide(color: Colors.black, width: 0.3),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(3.0),
-                                      ),
-                                    ),
-                                    child: Text('거래완료',style: TextStyle(fontSize: 14, color: Colors.grey),),
-                                  ),
-                                ),
                             ],
                           ),
                         ],

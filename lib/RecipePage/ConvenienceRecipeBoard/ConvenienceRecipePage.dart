@@ -48,32 +48,23 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
   }
 
   Future<void> fetchRecipeBoard() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/latest-list/1';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/latest-list/1';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(utf8.decode(response.bodyBytes));
         if (_isMounted && responseData['recipelatestList'] != null) {
-          print('${responseData}');
           if (responseData['recipelatestList'] is List) {
             final List<dynamic> messageList = responseData['recipelatestList'];
             List<RecipeBoardListItem> messages = [];
             for (var data in messageList) {
               List<String> boardTitleImageList = [];
-              List<String> writerProfileImage = [];
 
               if (data['boardTitleImage'] != null) {
                 if (data['boardTitleImage'] is String) {
                   boardTitleImageList = [data['boardTitleImage']];
                 } else {
                   boardTitleImageList = List<String>.from(data['boardTitleImage']);
-                }
-              }
-              if (data['writerProfileImage'] != null) {
-                if (data['writerProfileImage'] is String) {
-                  writerProfileImage = [data['writerProfileImage']];
-                } else {
-                  writerProfileImage = List<String>.from(data['writerProfileImage']);
                 }
               }
               messages.add(
@@ -178,7 +169,7 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black, width: 0.5),
                             image: DecorationImage(
-                              image: FileImage(File(message.boardTitleImage[0])),
+                              image:NetworkImage(message.boardTitleImage.last),
                               fit: BoxFit.fill,
                             ),
                           ),

@@ -54,7 +54,7 @@ class _MyTradecontentsState extends State<MyTradecontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://52.79.217.191:4000/api/v1/trade/trade-board/user-board-list/$userEmail';
+        'http://43.203.121.121:4000/api/v1/trade/trade-board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {

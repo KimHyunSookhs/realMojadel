@@ -10,7 +10,6 @@ import 'package:mojadel2/colors/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Config/ImagePathProvider.dart';
 
 class RecipeRegistar extends StatefulWidget {
   @override
@@ -66,7 +65,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       for (int i = 0; i < _steps.length; i++) {
         stepContents.add(_steps[i]['text'].text.trim());
       }
-      final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board';
+      final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board';
       Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_jwtToken',
@@ -111,52 +110,99 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       }
     }
 
-    Future<void> getImage(ImageSource imageSource) async {
-      final XFile? pickedFile = await picker.pickImage(source: imageSource);
-      if (pickedFile != null) {
-        String imagePath = await saveImagePermanently(File(pickedFile.path));
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://43.203.121.121:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
+
+    // 이미지 파일을 Multipart로 추가
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // JWT 토큰이 있을 경우 헤더에 추가
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      // 서버에 요청 보내기
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          return jsonResponse['url'];
+        } catch (e) {
+          return responseBody.body;
+        }
+      } else {
+        throw Exception('이미지 업로드 실패');
+      }
+    } catch (error) {
+      print('Error: $error');
+      return null;
+    }
+  }
+
+  Future<void> getImage(ImageSource imageSource) async {
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // 이미지를 서버로 업로드하고 URL 받기
+      String? imageUrl = await fileUploadRequest(imageFile);
+
+      if (imageUrl != null) {
         setState(() {
-          _boardImageList.add(imagePath.trim());
-          _image = pickedFile;
+          _boardImageList?.add(imageUrl);  // URL을 리스트에 추가
         });
       }
+    } else {
+      print('이미지 선택 안됨.');
     }
-    Future<void> getImageForStep(int index) async {
-      final XFile? pickedFile = await picker.pickImage(
-          source: ImageSource.gallery);
-      if (pickedFile != null) {
-        String imagePath = await saveImagePermanently(File(pickedFile.path));
+  }
+  Future<void> getImageForStep(int index) async {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // Upload the image to the server and get the URL
+      String? imageUrl = await fileUploadRequest(imageFile);
+
+      if (imageUrl != null) {
         setState(() {
-          _steps[index]['image'] = File(pickedFile.path);
+          _steps[index]['image'] = imageUrl;  // Store the URL instead of a File
+          // You can use the imageUrl to map to specific steps, like before
           switch (index) {
             case 0:
-              _step1Image = imagePath.trim();
+              _step1Image = imageUrl.trim();
               break;
             case 1:
-              _step2Image = imagePath.trim();
+              _step2Image = imageUrl.trim();
               break;
             case 2:
-              _step3Image = imagePath.trim();
+              _step3Image = imageUrl.trim();
               break;
             case 3:
-              _step4Image = imagePath.trim();
+              _step4Image = imageUrl.trim();
               break;
             case 4:
-              _step5Image = imagePath.trim();
+              _step5Image = imageUrl.trim();
               break;
             case 5:
-              _step6Image = imagePath.trim();
+              _step6Image = imageUrl.trim();
               break;
             case 6:
-              _step7Image = imagePath.trim();
+              _step7Image = imageUrl.trim();
               break;
             case 7:
-              _step8Image = imagePath.trim();
+              _step8Image = imageUrl.trim();
               break;
           }
         });
       }
     }
+  }
 
     void _addStep() {
       if (_steps.length < 8) {
@@ -166,146 +212,95 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       }
     }
 
-    Widget _buildStepField(int index) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 30,
-            height: 50,
-            alignment: Alignment.center,
-            child: Text('${index + 1}', style: TextStyle(fontSize: 20)),
-          ),
-          Expanded(
-            flex: 4,
-            child: TextField(
-              controller: _steps[index]['text'],
-              decoration: InputDecoration(hintText: '요리 순서를 입력하세요'),
-              minLines: 1,
-              maxLines: 2,
-            ),
-          ),
-          SizedBox(width: 10),
-          GestureDetector(
-            onTap: () {
-              getImageForStep(index);
-            },
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: _steps[index]['image'] != null
-                  ? Image.file(_steps[index]['image'], fit: BoxFit.cover)  // Display the image
-                  : Center(
-                  child: Icon(Icons.add_a_photo, size: 24, color: Colors.grey)),
-            ),
-          ),
-        ],
-      );
-    }
-
-    Widget _buildPhotoArea() {
-      return GestureDetector(
-        onTap: () {
-          getImage(ImageSource.gallery);
-        },
-        child: Container(
-          width: double.infinity,
-          height: 200,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: _image != null
-              ? Image.file(File(_image!.path), fit: BoxFit.fill)
-              : Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.photo, size: 50, color: Colors.grey),
-                SizedBox(height: 10),
-                Text(
-                  "대표 이미지를 추가해주세요",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
+  Widget _buildStepField(int index) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 30,
+          height: 50,
+          alignment: Alignment.center,
+          child: Text('${index + 1}', style: TextStyle(fontSize: 20)),
+        ),
+        Expanded(
+          flex: 4,
+          child: TextField(
+            controller: _steps[index]['text'],
+            decoration: InputDecoration(hintText: '요리 순서를 입력하세요'),
+            minLines: 1,
+            maxLines: 2,
           ),
         ),
-      );
-    }
-    Widget _buildCategoryAndCookingTimeField() {
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                Radio<RecipeType>(
-                  value: RecipeType.Recipe,
-                  groupValue: _recipeType,
-                  onChanged: (RecipeType? value) {
-                    setState(() {
-                      _recipeType = value;
-                    });
-                  },
-                ),
-                const Text('일반레시피',style:TextStyle(fontSize: 12)),
-              ],
+        SizedBox(width: 10),
+        GestureDetector(
+          onTap: () {
+            getImageForStep(index);
+          },
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: _steps[index]['image'] != null
+                ? Image.network(_steps[index]['image'], fit: BoxFit.cover)  // Display image from the network
+                : Center(
+                child: Icon(Icons.add_a_photo, size: 24, color: Colors.grey)),
           ),
-          Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                Radio<RecipeType>(
-                  value: RecipeType.ConvRecipe,
-                  groupValue: _recipeType,
-                  onChanged: (RecipeType? value) {
-                    setState(() {
-                      _recipeType = value;
-                    });
-                  },
-                ),
-                const Text('편의점레시피',style:TextStyle(fontSize: 12)),
-              ],
-            ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhotoArea() {
+    return GestureDetector(
+      onTap: () {
+        getImage(ImageSource.gallery);
+      },
+      child: Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: _boardImageList.isNotEmpty
+            ? Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: _boardImageList[0].startsWith('http')  // 첫 번째 이미지
+              ? Image.network(
+            _boardImageList[0],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.error, color: Colors.red),
+              );
+            },
+          )
+              : Image.file(
+            File(_boardImageList[0]),  // 로컬 파일일 경우
+            fit: BoxFit.cover,
           ),
-          SizedBox(width: 5,),
-          Expanded(
-            flex: 1,
-            child: Row(
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 10.0),
-                      isDense: true,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        cookingTime = int.tryParse(value);
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 5),
-                Text(
-                  '분',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+        )
+            : Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.photo, size: 50, color: Colors.grey),
+              SizedBox(height: 10),
+              Text(
+                "대표 이미지를 추가해주세요",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
           ),
-        ],
-      );
-    }
+        ),
+      ),
+    );
+  }
 
     @override
     Widget build(BuildContext context) {
@@ -509,4 +504,73 @@ class _RecipeRegistar extends State<RecipeRegistar> {
             ),
           ));
     }
+  Widget _buildCategoryAndCookingTimeField() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Row(
+            children: [
+              Radio<RecipeType>(
+                value: RecipeType.Recipe,
+                groupValue: _recipeType,
+                onChanged: (RecipeType? value) {
+                  setState(() {
+                    _recipeType = value;
+                  });
+                },
+              ),
+              const Text('일반레시피',style:TextStyle(fontSize: 12)),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Row(
+            children: [
+              Radio<RecipeType>(
+                value: RecipeType.ConvRecipe,
+                groupValue: _recipeType,
+                onChanged: (RecipeType? value) {
+                  setState(() {
+                    _recipeType = value;
+                  });
+                },
+              ),
+              const Text('편의점레시피',style:TextStyle(fontSize: 12)),
+            ],
+          ),
+        ),
+        SizedBox(width: 5,),
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              Flexible(
+                flex: 1,
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10.0),
+                    isDense: true,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      cookingTime = int.tryParse(value);
+                    });
+                  },
+                ),
+              ),
+              SizedBox(width: 5),
+              Text(
+                '분',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
   }

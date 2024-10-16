@@ -39,7 +39,6 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
     });
   }
 
-
   Future<void> _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     _jwtToken = prefs.getString('jwtToken');
@@ -53,7 +52,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
   Future<void> fetchTransactions(DateTime selectedDate) async {
     final String formattedDateTime = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String uri = 'http://52.79.217.191:4000/api/v1/account-log/day?datetime=$formattedDateTime';
+    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/day?datetime=$formattedDateTime';
     try {
       final response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -76,8 +75,13 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
           });
         }
       }
+      else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print("Formatted Date Time: $accountLogItemList");
+      }
     } catch (e) {
       print('Error fetching transactions: $e');
+      print("Formatted Date Time: $accountLogItemList");
     }
   }
 
@@ -131,7 +135,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
           category: item['category'],
           description: item['description'],
           amount: item['amount'],
-          type: item['type'] == 'income' ? 0 : 1, // Convert type to int (0 or 1)
+          type: item['type'] == 'income' ? 0 : 1,
           onTransactionUpdated: (String category, String description, int amount, int type) {
             _updateTransaction(item['accountLogNumber'].toString(), category, description, amount, type);
           },
@@ -141,13 +145,13 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
 
   Future<void> _updateTransaction(String accountLogNumber, String category, String description, int amount, int type) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/account-log/$accountLogNumber';
+    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/$accountLogNumber';
     final body = json.encode({
       "content": description,
-      "type": type, // Now it is an int (0 or 1)
-      "moneyCustomTypeNumber": category, // Adjust this mapping as needed
+      "type": type,
+      "moneyCustomTypeNumber": category,
       "money": amount,
-      "datetime": DateTime.now().toIso8601String(), // You might want to pass an actual date if needed
+      "datetime": DateTime.now().toIso8601String(),
     });
 
     try {
@@ -193,7 +197,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
 
   Future<void> _deleteTransaction(String accountLogNumber) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/account-log/$accountLogNumber';
+    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/$accountLogNumber';
     try {
       final response = await http.delete(
         Uri.parse(uri),

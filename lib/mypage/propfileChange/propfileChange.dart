@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mojadel2/Config/ImagePathProvider.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +25,7 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
   File? _imageFile;
   String? _jwtToken;
   String? _profileImageUrl;
-  final ImagePicker _picker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
 
   @override
   void initState() {
@@ -43,12 +42,21 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
       setState(() {
         _profileImageUrl = userInfo['profileImage'] ?? widget.profileImageUrl;
       });
+      print('${_profileImageUrl}');
     }
   }
 
   Future<void> saveAndGoBack() async {
     if (_imageFile != null) {
+      // 서버로 이미지 업로드
       await widget.uploadImage(_imageFile!);
+      // 서버에서 새로운 프로필 이미지 URL 확인
+      final updatedUserInfo = await UserInfoService.getUserInfo(_jwtToken!);
+      if (updatedUserInfo != null && updatedUserInfo['profileImage'] != null) {
+        setState(() {
+          _profileImageUrl = updatedUserInfo['profileImage']; // 업데이트된 URL 사용
+        });
+      }
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,45 +65,58 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
     }
   }
 
-  Future<void> _uploadImage(File imageFile) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jwtToken = prefs.getString('jwtToken');
-    if (jwtToken != null) {
-      try {
-        Map<String, String> headers = {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $jwtToken',
-        };
-        Uri url = Uri.parse('http://52.79.217.191:4000/api/v1/user/profile-image');
-        http.Response response = await http.patch(
-          url,
-          headers: headers,
-          body: jsonEncode({'profileImage': imageFile.path}),
-        );
-        if (response.statusCode == 200) {
-          final imageUrl = jsonDecode(response.body)['imageFile'];
-          setState(() {
-            _profileImageUrl = imageUrl;
-          });
-        } else {
-          print('Failed to upload image: ${response.statusCode}');
+
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://43.203.121.121:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
+
+    // 이미지 파일을 Multipart로 추가
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // JWT 토큰이 있을 경우 헤더에 추가
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      // 서버에 요청 보내기
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          return jsonResponse['url'];
+        } catch (e) {
+          return responseBody.body; // This will be a string (URL)
         }
-      } catch (e) {
-        print('Failed to upload image: $e');
+      } else {
+        throw Exception('이미지 업로드 실패');
       }
+    } catch (error) {
+      print('Error: $error');
+      return null;
     }
   }
 
-
   Future<void> getImage(ImageSource imageSource) async {
-    final XFile? pickedFile = await _picker.pickImage(source: imageSource);
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
-      String imagePath = await saveImagePermanently(File(pickedFile.path));
+      File imageFile = File(pickedFile.path);
+      String? imageUrl = await fileUploadRequest(imageFile);
+
       setState(() {
-        _imageFile = File(imagePath);
-        _profileImageUrl = imagePath;
+        _imageFile = imageFile;
+
       });
-      _uploadImage(File(imagePath));
+
+      if (imageUrl != null) {
+        setState(() {
+          _profileImageUrl = imageUrl.trim();
+        });
+        print('${_profileImageUrl}');
+      }
+    } else {
+      print('이미지 선택 안됨.');
     }
   }
 

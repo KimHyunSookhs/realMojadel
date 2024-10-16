@@ -1,9 +1,9 @@
-import 'dart:convert'; // For JSON decoding
-import 'package:http/http.dart' as http; // For HTTP requests
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class UserInfoService {
   static Future<Map<String, dynamic>> getUserInfo(String jwtToken) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/user';
+    final String uri = 'http://43.203.121.121:4000/api/v1/user';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $jwtToken',
     };

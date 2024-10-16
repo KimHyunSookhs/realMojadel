@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mojadel2/Config/ImagePathProvider.dart';
 import 'package:mojadel2/colors/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -67,17 +66,25 @@ class _EditRecipePageState extends State<EditRecipePage> {
   late TextEditingController _cookingTimeController;
   late List<String> _boardImageList;
   String? _jwtToken;
-  final ImagePicker _picker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
   List<Map<String, dynamic>> _steps = [];
   RecipeType? _recipeType;
-
+  void _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _jwtToken = prefs.getString('jwtToken');
+    });
+  }
   @override
   void initState() {
     super.initState();
+    _getToken();
     _titleController = TextEditingController(text: widget.initialTitle);
     _contentController = TextEditingController(text: widget.initialContent);
     _cookingTimeController = TextEditingController(text: widget.initialCookingTime.toString());
-    _boardImageList = widget.boardImageList ?? [];
+    if (widget.boardImageList != null) {
+      _boardImageList = List.from(widget.boardImageList!);
+    }
     _recipeType = widget.initialType == 0 ? RecipeType.Recipe : RecipeType.ConvRecipe;
     _steps = List.generate(8, (index) {
       return {
@@ -85,7 +92,6 @@ class _EditRecipePageState extends State<EditRecipePage> {
         'image': _getStepImagePath(index),
       };
     });
-    loadUserInfo();
   }
 
   String _getStepContent(int index) {
@@ -134,27 +140,18 @@ class _EditRecipePageState extends State<EditRecipePage> {
     }
   }
 
-  Future<void> loadUserInfo() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _jwtToken = prefs.getString('jwtToken');
-    });
-  }
-
   Future<void> _updateRecipe(BuildContext context) async {
     String title = _titleController.text;
-    String mainContent = _contentController.text;
+    String content = _contentController.text;
     int type = _recipeType == RecipeType.Recipe ? 0 : 1;
-    String content = mainContent.contains('재료:\n') ? mainContent : '$mainContent\n\n재료:\n';
     List<String> stepContents = [];
     List<String> stepImages = [];
 
-    for (int i = 0; i < _steps.length; i++) {
-      stepContents.add(_steps[i]['text'].text.trim());
-      String stepImageString = _steps[i]['image'] ?? '';
-      stepImages.add(stepImageString);
+    for (var step in _steps) {
+      stepContents.add(step['text'].text.trim());
+      stepImages.add(step['image'] ?? '');
     }
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -192,6 +189,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
       if (response.statusCode == 200) {
         Navigator.of(context).pop(true);
         Navigator.of(context).pop(true);
+        print('${postData}');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('레시피 수정에 실패했습니다.')),
@@ -204,28 +202,35 @@ class _EditRecipePageState extends State<EditRecipePage> {
     }
   }
 
-  Future<void> getImage(ImageSource imageSource, int index) async {
-    final XFile? pickedFile = await _picker.pickImage(source: imageSource);
-    if (pickedFile != null) {
-      final imagePath = await saveImagePermanently(File(pickedFile.path));
-      setState(() {
-        if (index == -1) {
-          if (_boardImageList.isNotEmpty) {
-            _boardImageList[0] = imagePath.trim();
-          } else {
-            _boardImageList.add(imagePath.trim());
-          }
-        } else {
-          _steps[index]['image'] = imagePath.trim();
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://43.203.121.121:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          return jsonResponse['url'];
+        } catch (e) {
+          return responseBody.body;
         }
-      });
+      } else {
+        throw Exception('이미지 업로드 실패');
+      }
+    } catch (error) {
+      return null;
     }
   }
-
   Widget _buildPhotoArea() {
     return GestureDetector(
       onTap: () {
-        getImage(ImageSource.gallery, -1);
+        getImage(ImageSource.gallery);
       },
       child: Container(
         width: double.infinity,
@@ -234,11 +239,75 @@ class _EditRecipePageState extends State<EditRecipePage> {
           border: Border.all(color: Colors.black),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: _boardImageList.isNotEmpty
-            ? Image.file(File(_boardImageList[0]), fit: BoxFit.cover)
-            : Center(child: Icon(Icons.add_a_photo, size: 50, color: Colors.grey)),
+        child: _boardImageList[0] != null && _boardImageList[0]!.isNotEmpty
+            ? Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: _boardImageList[0]!.startsWith('http')  // 마지막 이미지
+              ? Image.network(
+            _boardImageList[0]!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.error, color: Colors.red),
+              );
+            },
+          )
+              : Image.file(
+            File(_boardImageList[0]!),  // 로컬 파일일 경우
+            fit: BoxFit.cover,
+          ),
+        )
+            : Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.photo, size: 50, color: Colors.grey),
+              SizedBox(height: 10),
+              Text(
+                "대표 이미지를 추가해주세요",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  Future<void> getImage(ImageSource imageSource) async {
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // 이미지를 서버로 업로드하고 URL 받기
+      String? imageUrl = await fileUploadRequest(imageFile);
+      if (imageUrl != null) {
+        setState(() {
+          _boardImageList[0]=(imageUrl);  // URL을 리스트에 추가
+        });
+      }
+    } else {
+      print('이미지 선택 안됨.');
+    }
+  }
+  Future<void> getImageForStep(int index) async {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      String? imageUrl = await fileUploadRequest(imageFile);
+
+      if (imageUrl != null) {
+        setState(() {
+          _steps[index]['image'] = imageUrl;  // Update the URL for the specific step
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('이미지 업로드에 실패했습니다.')),
+        );
+      }
+    }
   }
 
   Widget _buildStepField(int index) {
@@ -264,7 +333,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
         SizedBox(width: 10),
         GestureDetector(
           onTap: () {
-            getImage(ImageSource.gallery, index);
+            getImageForStep(index); // Correctly call the image selector for each step
           },
           child: Container(
             width: 50,
@@ -274,7 +343,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: _steps[index]['image'] != null && _steps[index]['image'].isNotEmpty
-                ? Image.file(File(_steps[index]['image']), fit: BoxFit.cover)
+                ? Image.network(_steps[index]['image'], fit: BoxFit.cover) // Load image from URL
                 : Center(child: Icon(Icons.add_a_photo, size: 24, color: Colors.grey)),
           ),
         ),
@@ -320,7 +389,9 @@ class _EditRecipePageState extends State<EditRecipePage> {
               decoration: InputDecoration(labelText: '조리 시간 (분)'),
             ),
             SizedBox(height: 16),
-            ..._steps.asMap().entries.map((entry) => _buildStepField(entry.key)).toList(),
+            Text('요리 단계', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
+            SizedBox(height: 8),
+            ...List.generate(8, (index) => _buildStepField(index)),
           ],
         ),
       ),

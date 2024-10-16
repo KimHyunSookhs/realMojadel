@@ -69,7 +69,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     setState(() {
       isLoadingCategories = true;
     });
-    final String uri = 'http://52.79.217.191:4000/api/v1/account-log/custom-type';
+    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/custom-type';
     final prefs = await SharedPreferences.getInstance();
     final jwtToken = prefs.getString('jwtToken');
     try {
@@ -104,7 +104,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   // 카테고리 저장 함수
   Future<void> _saveCategoryToServer(String categoryName) async {
     try {
-      final url = Uri.parse('http://52.79.217.191:4000/api/v1/account-log/custom-type');
+      final url = Uri.parse('http://43.203.121.121:4000/api/v1/account-log/custom-type');
       final response = await http.post(
         url,
         headers: {
@@ -162,7 +162,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     final customTypeNumber = categoryMap[categoryName]; // 선택된 카테고리의 번호를 가져옴
     if (customTypeNumber != null) {
       try {
-        final url = Uri.parse('http://52.79.217.191:4000/api/v1/account-log/custom-type/$customTypeNumber');
+        final url = Uri.parse('http://43.203.121.121:4000/api/v1/account-log/custom-type/$customTypeNumber');
         final response = await http.delete(
           url,
           headers: {
@@ -190,7 +190,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       int amount = int.parse(amountController.text);
       int type = isIncomeSelected ? 0 : 1; // 0 수입, 1 지출
 
-      final String uri = 'http://52.79.217.191:4000/api/v1/account-log';
+      final String uri = 'http://43.203.121.121:4000/api/v1/account-log';
       try {
         final response = await http.post(
           Uri.parse(uri),

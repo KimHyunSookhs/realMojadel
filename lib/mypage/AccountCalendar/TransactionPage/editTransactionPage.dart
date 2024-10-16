@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:mojadel2/colors/colors.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditTransactionPage extends StatefulWidget {
-  final String accountLogNumber;
+  final int accountLogNumber;
   final String category;
   final String description;
   final int amount;
-  final int type; // Assuming this is still a String (e.g., 'income' or 'expense')
+  final int type;
   final Function(String, String, int, int) onTransactionUpdated; // Change here
 
   EditTransactionPage({
@@ -26,6 +30,7 @@ class _EditTransactionPageState extends State<EditTransactionPage> {
   late TextEditingController _categoryController;
   late TextEditingController _descriptionController;
   late TextEditingController _amountController;
+  String? _jwtToken;
 
   @override
   void initState() {
@@ -33,6 +38,7 @@ class _EditTransactionPageState extends State<EditTransactionPage> {
     _categoryController = TextEditingController(text: widget.category);
     _descriptionController = TextEditingController(text: widget.description);
     _amountController = TextEditingController(text: widget.amount.toString());
+    loadUserInfo();
   }
 
   @override
@@ -42,18 +48,47 @@ class _EditTransactionPageState extends State<EditTransactionPage> {
     _amountController.dispose();
     super.dispose();
   }
+  Future<void> loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    _jwtToken = prefs.getString('jwtToken');
 
-  void _updateTransaction() {
+  }
+  Future<void> _updateTransaction() async {
     String category = _categoryController.text;
     String description = _descriptionController.text;
     int amount = int.tryParse(_amountController.text) ?? 0;
+    int type = widget.type; // 이미 정수로 되어있으므로 변환 불필요
 
-    int type = widget.type == 'income' ? 0 : 1; // Convert to int for PATCH request
+    // 서버에 PATCH 요청 보내기
+    try {
+      final url = Uri.parse('http://43.203.121.121:4000/api/v1/account-log/${widget.accountLogNumber}');
 
-    // Call the onTransactionUpdated callback with the new values
-    widget.onTransactionUpdated(category, description, amount, type);
-    Navigator.pop(context); // Close the edit page
+      final response = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        body: jsonEncode({
+          'category': category,
+          'description': description,
+          'amount': amount,
+          'type': type,
+        }),
+      );
+      if (response.statusCode == 200) {
+        widget.onTransactionUpdated(category, description, amount, type);
+        Navigator.pop(context);
+      }
+      else{
+        print('${response.body}');
+        print('${description}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {

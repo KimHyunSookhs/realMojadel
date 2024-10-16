@@ -65,7 +65,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/latest-list';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -139,7 +139,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -265,9 +265,13 @@ class _MainhomePageState extends State<MainhomePage> {
                                 width: 80,
                                 height: 90,
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black, width: 0.5), // 실선 테두리 추가
+                                  border: Border.all(color: Colors.black, width: 0.5),
                                   image: DecorationImage(
-                                    image: FileImage(File(message.boardTitleImage[0])), // Use FileImage for local images
+                                    image: message.boardTitleImage.isNotEmpty
+                                        ? (message.boardTitleImage[0].startsWith('http')
+                                        ? NetworkImage(message.boardTitleImage[0]) as ImageProvider<Object>
+                                        : FileImage(File(message.boardTitleImage[0])) as ImageProvider<Object>)
+                                        : AssetImage('assets/placeholder_image.png') as ImageProvider<Object>, // Use a placeholder if no image
                                     fit: BoxFit.fill,
                                   ),
                                 ),

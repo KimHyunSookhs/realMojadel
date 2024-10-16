@@ -79,7 +79,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipeBoard(int type, StreamController<List<RecipeBoardListItem>> streamController, Function(List<RecipeBoardListItem>) onSuccess) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/latest-list/$type';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/latest-list/$type';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -105,7 +105,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://52.79.217.191:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
+    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -157,10 +157,20 @@ class _RecipePageState extends State<RecipePage> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 0.3),
                     borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: FileImage(File(item.boardTitleImage.isNotEmpty ? item.boardTitleImage[0] : '')),
-                      fit: BoxFit.fill,
-                    ),
+                  ),
+                  child: item.boardTitleImage.isNotEmpty
+                      ? (item.boardTitleImage.last.startsWith('http')
+                      ? Image.network(
+                    item.boardTitleImage.last,
+                    fit: BoxFit.fill,
+                  )
+                      : Image.file(
+                    File(item.boardTitleImage.last),
+                    fit: BoxFit.fill,
+                  ))
+                      : Image.asset(
+                    'assets/placeholder_image.png',
+                    fit: BoxFit.fill,
                   ),
                 ),
                 SizedBox(width: 10),
@@ -211,17 +221,20 @@ class _RecipePageState extends State<RecipePage> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.timer_sharp, size: 14,),
-                            SizedBox(width: 4,),
+                            Icon(Icons.timer_sharp, size: 14),
+                            SizedBox(width: 4),
                             Text(
                               '${item.cookingTime}',
                               style: TextStyle(
                                 fontSize: 11,
                               ),
                             ),
-                            Text('분', style: TextStyle(
-                              fontSize: 11,
-                            ),),
+                            Text(
+                              '분',
+                              style: TextStyle(
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -384,7 +397,6 @@ class _RecipePageState extends State<RecipePage> {
       ),
     );
   }
-
 }
 
 class _RecipeGridState extends State<RecipeGrid> {
@@ -425,31 +437,33 @@ class _RecipeGridState extends State<RecipeGrid> {
                     widget.onRefresh();
                   }
                 },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 160,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 0.3),
-                        image: message.boardTitleImage
-                            .isNotEmpty
-                            ? DecorationImage(
-                          image: FileImage(File(message.boardTitleImage[0])),
-                          fit: BoxFit.fill,
-                        )
-                            : null, // Handle empty images
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 160,
+                        height: 140,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 0.3),
+                          image: message.boardTitleImage.isNotEmpty
+                              ? DecorationImage(
+                            image: NetworkImage(message.boardTitleImage.last),
+                            fit: BoxFit.fill,
+                          )
+                              : DecorationImage(
+                            image: AssetImage('assets/placeholder_image.png'),
+                            fit: BoxFit.fill,
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      message.title,
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                      SizedBox(height: 5),
+                      Text(
+                        message.title,
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
               );
             },
           );
