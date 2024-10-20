@@ -65,7 +65,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/latest-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -139,7 +139,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -262,8 +262,8 @@ class _MainhomePageState extends State<MainhomePage> {
                           child: Row(
                             children: [
                               Container(
-                                width: 80,
-                                height: 90,
+                                width: 100,
+                                height: 120,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.black, width: 0.5),
                                   image: DecorationImage(
@@ -281,12 +281,15 @@ class _MainhomePageState extends State<MainhomePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    SizedBox(height: 5,),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           message.title,
                                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         if (_tradeCompletionStatus[message.boardNumber] == true) ...[
                                           Text(
@@ -300,14 +303,13 @@ class _MainhomePageState extends State<MainhomePage> {
                                         ],
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        Text('${message.tradeLocation}'),
-                                        SizedBox(width: 6),
-                                        Text(formatDatetime('${message.writeDatetime}')),
-                                      ],
+                                    SizedBox(
+                                      child: Text('${message.tradeLocation}',
+                                        style: TextStyle(fontSize: 12),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                    SizedBox(height: 5),
+                                    Text(formatDatetime('${message.writeDatetime}')),
                                     Text('${message.price}원', style: TextStyle(fontSize: 15, color: Colors.green)),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,

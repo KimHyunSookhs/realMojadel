@@ -67,7 +67,7 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
 
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://43.203.121.121:4000/file/upload");
+    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
 
     // 이미지 파일을 Multipart로 추가

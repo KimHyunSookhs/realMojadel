@@ -67,7 +67,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,7 +150,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
+        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail,
@@ -181,7 +181,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -213,7 +213,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
+        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content,
@@ -237,7 +237,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -264,7 +264,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
   Future<void> deleteComment(int commentNumber) async {
     final String uri =
-        'http://43.203.121.121:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -284,7 +284,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -308,7 +308,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> deleteRecipeBoard() async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -463,9 +463,9 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                   const SizedBox(height: 10),
                   Text(
                     content,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 12),
                   ),
-                  SizedBox(height: 14,),
+                  SizedBox(height: 12,),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [

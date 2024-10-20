@@ -70,7 +70,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Future<void> fetchCalendarData() async {
     final String date = '${year.toString()}-${month.toString().padLeft(
         2, '0')}';
-    final String uri = 'http://43.203.121.121:4000/api/v1/account-log/calender?datetime=$date';
+    final String uri = 'http://13.125.228.152:4000/api/v1/account-log/calender?datetime=$date';
 
     final prefs = await SharedPreferences.getInstance();
     final jwtToken = prefs.getString('jwtToken');
@@ -111,7 +111,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       DateTime selectedDate = DateTime(year, month, day);
       final String formattedDateTime = DateFormat('yyyy-MM-dd').format(
           selectedDate);
-      final String uri = 'http://43.203.121.121:4000/api/v1/account-log/day?datetime=$formattedDateTime';
+      final String uri = 'http://13.125.228.152:4000/api/v1/account-log/day?datetime=$formattedDateTime';
 
       try {
         final response = await http.get(Uri.parse(uri), headers: {

@@ -36,7 +36,7 @@ class _WriteBoardState extends State<WriteBoard> {
   Future<void> _savePost(BuildContext context) async {
     String title = _titleController.text;
     String content = _contentController.text;
-    final String uri = 'http://43.203.205.218:4000/api/v1/community/board';
+    final String uri = 'http://13.125.228.152:4000/api/v1/community/board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ class _WriteBoardState extends State<WriteBoard> {
   }
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://43.203.205.218:4000/file/upload");
+    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
     // 이미지 파일을 Multipart로 추가
     request.files.add(await http.MultipartFile.fromPath('file', file.path));

@@ -79,7 +79,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipeBoard(int type, StreamController<List<RecipeBoardListItem>> streamController, Function(List<RecipeBoardListItem>) onSuccess) async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/latest-list/$type';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/latest-list/$type';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -105,7 +105,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://43.203.121.121:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
+    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',

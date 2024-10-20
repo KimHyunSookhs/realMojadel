@@ -50,7 +50,7 @@ class _RegistarPageState extends State<RegistarPage> {
     String content = _contentController.text;
     String tradeLocation = _locationController.text;
     String price = _priceController.text;
-    final String uri = 'http://43.203.205.218:4000/api/v1/trade/trade-board';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ class _RegistarPageState extends State<RegistarPage> {
   }
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://43.203.205.218:4000/file/upload");
+    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
 
     // 이미지 파일을 Multipart로 추가

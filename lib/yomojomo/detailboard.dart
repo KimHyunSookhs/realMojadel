@@ -62,7 +62,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}';
+    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -115,7 +115,7 @@ class _DetailBoardState extends State<DetailBoard> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}/favorite';
+        'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail, // 사용자 이메일 추가
@@ -146,7 +146,7 @@ class _DetailBoardState extends State<DetailBoard> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}/favorite-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -178,7 +178,7 @@ class _DetailBoardState extends State<DetailBoard> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}/comment';
+        'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content, // Add the comment text
@@ -205,7 +205,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchComments() async {
-    final String uri = 'http://43.203.205.218:4000/api/v1/community/board/${widget.postId}/comment-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -245,7 +245,7 @@ class _DetailBoardState extends State<DetailBoard> {
       return;
     }
     final String uri =
-        'http://43.203.205.218:4000/api/v1/community/board/$boardNumber/$commentNumber';
+        'http://13.125.228.152:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -266,7 +266,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://43.203.205.218:4000/api/v1/community/board/$boardNumber/$commentNumber';
+    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent, // New content for the comment
@@ -357,7 +357,7 @@ class _DetailBoardState extends State<DetailBoard> {
                           Text(
                             writerNickname,
                             style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold),
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           Text(
                             formatDatetime(writeDatetime),
@@ -370,12 +370,12 @@ class _DetailBoardState extends State<DetailBoard> {
                   const Divider(height: 20),
                   Text(
                     title,
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
                   Text(
                     content,
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 18),
                   ),
                   const SizedBox(height: 10),
                   if (imageUrls.isNotEmpty)

@@ -29,7 +29,7 @@ Future<void> confirmDelete(BuildContext context, int postId, String jwtToken) as
 }
 
 Future<void> _deletePost(BuildContext context, int postId, String jwtToken) async {
-  final String uri = 'http://43.203.205.218:4000/api/v1/community/board/$postId';
+  final String uri = 'http://13.125.228.152:4000/api/v1/community/board/$postId';
   try {
     http.Response response = await http.delete(
       Uri.parse(uri),

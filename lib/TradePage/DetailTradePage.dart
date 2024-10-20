@@ -64,7 +64,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
   }
 
   Future<void> fetchTradeDetail() async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -152,7 +152,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
   }
 
   Future<void> deleteTradeBoard() async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -190,7 +190,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/comment';
+        'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content, // Add the comment text
@@ -214,7 +214,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/comment-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -240,7 +240,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> deleteComment(int commentNumber) async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -258,7 +258,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     } catch (error) {}
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -285,7 +285,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite';
+        'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail, // 사용자 이메일 추가
@@ -316,7 +316,7 @@ class _DetailTradePageState extends State<DetailTradePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://43.201.46.108:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite-list';
+    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',

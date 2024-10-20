@@ -52,7 +52,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://43.203.121.121:4000/api/v1/community/board/user-board-list/$userEmail';
+        'http://13.125.228.152:4000/api/v1/community/board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
