@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mojadel2/homepage/home_detail.dart';
+import 'package:mojadel2/mypage/mypage.dart';
 import 'package:mojadel2/mypage/tabBar/TabBarList.dart';
+import 'package:mojadel2/mypage/tabBar/MyBoardContents.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../colors/colors.dart';
 
@@ -42,11 +45,6 @@ class _LogInPageState extends State<LogInPage> {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       final String jwtToken = responseData['token']; // Assuming the token key is 'token'
       return jwtToken;
-    } else {
-      print('로그인 실패');
-      print('응답 코드: ${response.statusCode}');
-      print('응답 본문: ${response.body}');
-      return null;
     }
   }
 
@@ -91,8 +89,15 @@ class _LogInPageState extends State<LogInPage> {
                     final prefs = await SharedPreferences.getInstance();
                     prefs.setString('jwtToken', jwtToken);
                     prefs.setString('userEmail', email);
-                    Navigator.pop(context, jwtToken);
-                  }
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        // 기본으로 MyPageSite를 보여주도록 설정
+                        return HomePage(selectedIndex: 4); // MyPage의 인덱스 번호
+                      }),
+                          (Route<dynamic> route) => false, // 모든 이전 페이지를 제거합니다.
+                    );
+                   }
                      else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -100,9 +105,7 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                       );
                   }
-                  TabBarUsingController2();
                 },
-
                 child: Text('로그인'),
               ),
               if (_jwtToken != null)

@@ -129,8 +129,6 @@ class _RegistarPageState extends State<RegistarPage> {
           _boardImageList.add(imageUrl);  // URL을 리스트에 추가
         });
       }
-    } else {
-      print('이미지 선택 안됨.');
     }
   }
 

@@ -70,6 +70,7 @@ class OptionMenu extends StatelessWidget {
           break;
         case 'logout':
           logoutCallback();
+          TabBarUsingController2();
           break;
       }
     }

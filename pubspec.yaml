@@ -39,7 +39,7 @@ dependencies:
   geolocator: ^11.0.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.0
-  google_maps_flutter: ^2.2.8
+  google_maps_flutter: ^2.9.0
   http: ^1.2.1
   get: ^4.6.6
   flutter_secure_storage: ^9.0.0
@@ -62,18 +62,19 @@ dependencies:
   socket_io_client: ^2.0.3+1
   fl_chart: ^0.69.0
   table_calendar: ^3.1.2
+  location: ^7.0.1
 flutter_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/Icon/houseimg.png"
 #
-#flutter_native_splash:
-#  color: "#FFFFFF"
-##  image: assets/Icon/houseimg.png
-#  text: 'How?se'
-#  text_color: "#000000"
-#  text_size: 24
-#  gravity: bottom
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/Icon/houseimg.png
+  text: 'How?se'
+  text_color: "#000000"
+  text_size: 24
+  gravity: bottom
 
 dev_dependencies:
   flutter_test:

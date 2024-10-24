@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mojadel2/RecipePage/RecipePage.dart';
-import 'package:mojadel2/colors/colors.dart';
 import 'package:mojadel2/TradePage/TradePage.dart';
 import 'package:mojadel2/mypage/mypage.dart';
 import 'package:flutter/widgets.dart';
@@ -9,7 +8,9 @@ import '../yomojomo/messageboard.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int selectedIndex; // 선택된 인덱스를 저장할 변수
+
+  const HomePage({super.key, this.selectedIndex = 0}); //
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   static  List<Widget> _widgetOptions = <Widget> [
     MainhomePage(),
     ChatBoardPage(),
@@ -25,7 +26,11 @@ class _HomePageState extends State<HomePage> {
     RecipePage(),
     MyPageSite(),
   ];
-
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex; // 전달된 인덱스를 사용
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

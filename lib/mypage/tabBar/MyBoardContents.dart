@@ -27,7 +27,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
     _messageStreamController = StreamController<List<TradeBoardListItem>>();
     _loadUserInfo().then((_) {
       if (_isLoggedIn) {
-        _fetchMyBoards();
+        fetchMyBoards();
       } else {
         _messageStreamController.add([]);
       }
@@ -50,7 +50,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
     }
   }
 
-  Future<void> _fetchMyBoards() async {
+  Future<void> fetchMyBoards() async {
     final String uri =
         'http://13.125.228.152:4000/api/v1/community/board/user-board-list/$userEmail';
     try {
@@ -184,7 +184,7 @@ class _MyboardcontentsState extends State<Myboardcontents> {
                                 ),
                               ),
                             );
-                            _fetchMyBoards();
+                            fetchMyBoards();
                           },
                         ),
                         if (index != messages.length - 1) Divider(),

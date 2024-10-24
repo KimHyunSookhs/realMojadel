@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mojadel2/mypage/AccountCalendar/account_calendar_home.dart';
-import 'package:mojadel2/mypage/CheckList/checklist_calendar_home.dart';
 import 'package:mojadel2/mypage/tabBar/MyBoardContents.dart';
 import 'package:mojadel2/mypage/tabBar/MyRecipeContents.dart';
 import 'package:mojadel2/mypage/tabBar/MyTradeContents.dart';

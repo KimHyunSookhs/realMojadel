@@ -211,7 +211,7 @@ class _MessageBoardState extends State<MessageBoard> {
                         title: Text(
                           message.title,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'NotoSansKR',
                           ),
@@ -221,32 +221,32 @@ class _MessageBoardState extends State<MessageBoard> {
                             Expanded(
                               child: Text(
                                 message.content,
-                                style: TextStyle(fontSize: 13),
+                                style: TextStyle(fontSize: 12),
                                 maxLines: 1, // 최대 1줄로 제한
                                 overflow: TextOverflow.ellipsis, // 글자수가 초과되면 "..."으로 축약
                               ),
                             ),
                             Row(
                               children: [
-                                Icon(Icons.favorite),
+                                Icon(Icons.favorite,size: 18),
                                 SizedBox(width: 2),
                                 Text(
                                   '${message.favoriteCount}',
-                                  style: TextStyle(fontSize: 12),
+                                  style: TextStyle(fontSize: 11),
                                 ),
                                 SizedBox(width: 2),
-                                Icon(Icons.comment),
+                                Icon(Icons.comment,size: 18),
                                 SizedBox(width: 2),
                                 Text(
                                   '${message.commentCount}',
-                                  style: TextStyle(fontSize: 12),
+                                  style: TextStyle(fontSize: 11),
                                 ),
                                 SizedBox(width: 2),
-                                Icon(Icons.remove_red_eye,),
+                                Icon(Icons.remove_red_eye,size: 18),
                                 SizedBox(width: 2),
                                 Text(
                                   '${message.viewCount}',
-                                  style: TextStyle(fontSize: 12),
+                                  style: TextStyle(fontSize: 11),
                                 ),
                               ],
                             ),

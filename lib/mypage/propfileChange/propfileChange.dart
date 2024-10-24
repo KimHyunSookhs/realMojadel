@@ -87,7 +87,7 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
           final jsonResponse = json.decode(responseBody.body);
           return jsonResponse['url'];
         } catch (e) {
-          return responseBody.body; // This will be a string (URL)
+          return responseBody.body;
         }
       } else {
         throw Exception('이미지 업로드 실패');
@@ -106,7 +106,6 @@ class _ProfileChangePageState extends State<ProfileChangePage> {
 
       setState(() {
         _imageFile = imageFile;
-
       });
 
       if (imageUrl != null) {

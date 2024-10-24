@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'optionMenu/optionMenu.dart';
+import 'propfileChange/propfileChange.dart';
 
 class MyPageSite extends StatefulWidget {
   const MyPageSite({Key? key}) : super(key: key);
@@ -47,33 +48,72 @@ class _MyPageSiteState extends State<MyPageSite>
       });
     }
   }
+  Future<String?> fileUploadRequest(File file) async {
+    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
+    final request = http.MultipartRequest('POST', url);
 
+    // 이미지 파일을 Multipart로 추가
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+    // JWT 토큰이 있을 경우 헤더에 추가
+    if (_jwtToken != null) {
+      request.headers['Authorization'] = 'Bearer $_jwtToken';
+    }
+
+    try {
+      // 서버에 요청 보내기
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await http.Response.fromStream(response);
+        try {
+          final jsonResponse = json.decode(responseBody.body);
+          return jsonResponse['url'];
+        } catch (e) {
+          return responseBody.body; // This will be a string (URL)
+        }
+      } else {
+        throw Exception('이미지 업로드 실패');
+      }
+    } catch (error) {
+      print('Error: $error');
+      return null;
+    }
+  }
   Future<void> _uploadImage(File imageFile) async {
     final prefs = await SharedPreferences.getInstance();
     final jwtToken = prefs.getString('jwtToken');
     if (jwtToken != null) {
       try {
-        Map<String, String> headers = {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $jwtToken',
-        };
-        Uri url = Uri.parse('http://13.125.228.152:4000/api/v1/user/profile-image');
-        http.Response response = await http.patch(
-          url,
-          headers: headers,
-          body: jsonEncode({'profileImage': imageFile.path}),
-        );
-        if (response.statusCode == 200) {
-          final imageUrl = jsonDecode(response.body)['imageFile'];
-          setState(() {
-            _profileImageUrl = imageUrl;
-          });
+        // 이미지 파일을 서버로 업로드하는 부분
+        final imageUrl = await fileUploadRequest(imageFile); // 서버에서 업로드된 이미지 URL 반환
+
+        if (imageUrl != null) {
+          Map<String, String> headers = {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $jwtToken',
+          };
+          Uri url = Uri.parse('http://13.125.228.152:4000/api/v1/user/profile-image');
+
+          // 서버에 저장된 이미지 URL을 전송
+          http.Response response = await http.patch(
+            url,
+            headers: headers,
+            body: jsonEncode({'profileImage': imageUrl}), // 로컬 경로 대신 서버 URL 사용
+          );
+
+          if (response.statusCode == 200) {
+            final updatedUserInfo = jsonDecode(response.body);
+            setState(() {
+              _profileImageUrl = updatedUserInfo['profileImage']; // 서버에서 받은 URL로 프로필 이미지 업데이트
+            });
+          }
         }
       } catch (e) {
         print('Failed to upload image: $e');
       }
     }
   }
+
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
@@ -82,6 +122,7 @@ class _MyPageSiteState extends State<MyPageSite>
       _nickname = null;
       _jwtToken = null;
       _profileImageUrl = null;
+      TabBarUsingController2();
     });
   }
   Future<void> updateJwtToken(String? jwtToken) async {
