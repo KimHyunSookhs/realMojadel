@@ -1,6 +1,12 @@
 # mojadel2
 
-A new Flutter project.
+자취생들을 위한 다양한 서비스를 제공하는 앱
+
+- 중고거래
+- 레시피 공유
+- 요모조모(게시판)
+- 가계부
+- 자취생 확인 체크리스트
 
 ## Getting Started
 
