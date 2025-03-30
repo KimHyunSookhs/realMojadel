@@ -46,7 +46,7 @@ class _EditTradeState extends State<EditTradePage> {
     }
   }
   Future<void> _patchTrade() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/${widget.tradeId}';
+    final String uri = 'http://43.203.230.194:4000/api/v1/trade/trade-board/${widget.tradeId}';
     try {
       final prefs = await SharedPreferences.getInstance();
       final jwtToken = prefs.getString('jwtToken');
@@ -81,7 +81,7 @@ class _EditTradeState extends State<EditTradePage> {
   }
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
+    final url = Uri.parse("http://43.203.230.194:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
 
     // 이미지 파일을 Multipart로 추가

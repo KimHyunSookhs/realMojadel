@@ -61,7 +61,7 @@ class _EditTransactionPageState extends State<EditTransactionPage> {
 
     // 서버에 PATCH 요청 보내기
     try {
-      final url = Uri.parse('http://13.125.228.152:4000/api/v1/account-log/${widget.accountLogNumber}');
+      final url = Uri.parse('http://43.203.230.194:4000/api/v1/account-log/${widget.accountLogNumber}');
 
       final response = await http.patch(
         url,

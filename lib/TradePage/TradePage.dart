@@ -65,7 +65,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> fetchtradeBoard() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/latest-list';
+    final String uri = 'http://43.203.230.194:4000/api/v1/trade/trade-board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -139,7 +139,7 @@ class _MainhomePageState extends State<MainhomePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/search-list/$searchWord';
+    final String uri = 'http://43.203.230.194:4000/api/v1/trade/trade-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -179,11 +179,7 @@ class _MainhomePageState extends State<MainhomePage> {
             _messages = searchResults;
           });
           _messageStreamController.add(searchResults);
-        } else {
-          print('No search results found');
         }
-      } else {
-        print('Failed to perform search: ${response.statusCode}');
       }
     } catch (error) {
       print('Failed to perform search: $error');

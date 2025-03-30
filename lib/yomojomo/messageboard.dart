@@ -29,7 +29,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _fetchMessages() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/latest-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/latest-list';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -111,7 +111,7 @@ class _MessageBoardState extends State<MessageBoard> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/search-list/$searchWord';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가

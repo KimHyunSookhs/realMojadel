@@ -29,7 +29,7 @@ Future<void> confirmDelete(BuildContext context, int recipeId, String jwtToken) 
 }
 
 Future<void> _deleteRecipePost(BuildContext context, int recipeId, String jwtToken) async {
-  final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/$recipeId';
+  final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/$recipeId';
   try {
     http.Response response = await http.delete(
       Uri.parse(uri),

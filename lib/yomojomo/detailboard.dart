@@ -62,7 +62,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken', // 인증 헤더 추가
@@ -115,7 +115,7 @@ class _DetailBoardState extends State<DetailBoard> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/favorite';
+        'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail, // 사용자 이메일 추가
@@ -146,7 +146,7 @@ class _DetailBoardState extends State<DetailBoard> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/favorite-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -178,7 +178,7 @@ class _DetailBoardState extends State<DetailBoard> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/comment';
+        'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content, // Add the comment text
@@ -205,7 +205,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> fetchComments() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/${widget.postId}/comment-list';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/${widget.postId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -245,7 +245,7 @@ class _DetailBoardState extends State<DetailBoard> {
       return;
     }
     final String uri =
-        'http://13.125.228.152:4000/api/v1/community/board/$boardNumber/$commentNumber';
+        'http://10.0.2.2:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -266,7 +266,7 @@ class _DetailBoardState extends State<DetailBoard> {
   }
 
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/community/board/$boardNumber/$commentNumber';
+    final String uri = 'http://10.0.2.2:4000/api/v1/community/board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent, // New content for the comment
@@ -361,7 +361,7 @@ class _DetailBoardState extends State<DetailBoard> {
                           ),
                           Text(
                             formatDatetime(writeDatetime),
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -372,21 +372,21 @@ class _DetailBoardState extends State<DetailBoard> {
                     title,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 15),
+                  SizedBox(height: MediaQuery.of(context).size.height*0.02),
                   Text(
                     content,
                     style: TextStyle(fontSize: 18),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: MediaQuery.of(context).size.height*0.02),
                   if (imageUrls.isNotEmpty)
                     Column(
                       children: [
                         for (String imageUrl in imageUrls)
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Container(
-                              width: 400,
-                              height: 200,
+                              width:  MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.width*0.6,
                               decoration: BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 border: Border.all(
@@ -477,7 +477,7 @@ class _DetailBoardState extends State<DetailBoard> {
                           ListTile(
                             title: Text(
                               comments[index].nickname ?? '', // 닉네임
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize:12),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize:15),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,10 +487,10 @@ class _DetailBoardState extends State<DetailBoard> {
                                   style: TextStyle(
                                       fontSize: 10, color: Colors.grey),
                                 ),
-                                SizedBox(height: 5),
+                                SizedBox(height: MediaQuery.of(context).size.height*0.008),
                                 Text(
                                   comments[index].content ?? '', // 댓글 내용
-                                  style: TextStyle(fontSize: 9),
+                                  style: TextStyle(fontSize: 13),
                                 ),
                               ],
                             ),

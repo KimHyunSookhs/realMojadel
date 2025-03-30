@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class UserInfoService {
   static Future<Map<String, dynamic>> getUserInfo(String jwtToken) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/user';
+    final String uri = 'http://10.0.2.2:4000/api/v1/user';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $jwtToken',
     };

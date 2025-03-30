@@ -55,7 +55,7 @@ class _MyRecipecontentsState extends State<MyRecipecontents> {
 
   Future<void> _fetchMyBoards() async {
     final String uri =
-        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
+        'http://43.203.230.194:4000/api/v1/recipe/recipe-board/user-board-list/$userEmail';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {

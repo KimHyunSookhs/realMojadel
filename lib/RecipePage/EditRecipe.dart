@@ -151,7 +151,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
       stepContents.add(step['text'].text.trim());
       stepImages.add(step['image'] ?? '');
     }
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
   }
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
+    final url = Uri.parse("http://43.203.230.194:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     if (_jwtToken != null) {

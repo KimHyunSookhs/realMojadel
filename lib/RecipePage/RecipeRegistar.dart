@@ -65,7 +65,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
       for (int i = 0; i < _steps.length; i++) {
         stepContents.add(_steps[i]['text'].text.trim());
       }
-      final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board';
+      final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board';
       Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_jwtToken',
@@ -111,7 +111,7 @@ class _RecipeRegistar extends State<RecipeRegistar> {
     }
 
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
+    final url = Uri.parse("http://43.203.230.194:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
 
     // 이미지 파일을 Multipart로 추가

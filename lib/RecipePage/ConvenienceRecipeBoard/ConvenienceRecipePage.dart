@@ -48,7 +48,7 @@ class _ConvenienceRecipePageState extends State<ConvenienceRecipePage> {
   }
 
   Future<void> fetchRecipeBoard() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/latest-list/1';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/latest-list/1';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {

@@ -49,7 +49,7 @@ class _MyPageSiteState extends State<MyPageSite>
     }
   }
   Future<String?> fileUploadRequest(File file) async {
-    final url = Uri.parse("http://13.125.228.152:4000/file/upload");
+    final url = Uri.parse("http://10.0.2.2:4000/file/upload");
     final request = http.MultipartRequest('POST', url);
 
     // 이미지 파일을 Multipart로 추가
@@ -92,7 +92,7 @@ class _MyPageSiteState extends State<MyPageSite>
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $jwtToken',
           };
-          Uri url = Uri.parse('http://13.125.228.152:4000/api/v1/user/profile-image');
+          Uri url = Uri.parse('http://10.0.2.2:4000/api/v1/user/profile-image');
 
           // 서버에 저장된 이미지 URL을 전송
           http.Response response = await http.patch(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mojadel2/Config/ConfirmDelete.dart';
@@ -67,7 +68,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> fetchPostDetails() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -150,7 +151,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
       isUpdatingFavorite = true;
     });
     final String uri =
-        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
+        'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite';
     try {
       final Map<String, dynamic> requestBody = {
         'email': _userEmail,
@@ -181,7 +182,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchFavorits() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}/favorite-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -213,7 +214,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
 
   Future<void> postComment(String content) async {
     final String uri =
-        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
+        'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment';
     try {
       final Map<String, dynamic> requestBody = {
         'content': content,
@@ -237,7 +238,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> fetchComments() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}/comment-list';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -264,7 +265,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
   Future<void> deleteComment(int commentNumber) async {
     final String uri =
-        'http://13.125.228.152:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+        'http://43.203.230.194:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -284,7 +285,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
     }
   }
   Future<void> editComment(int commentNumber, String newContent) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/$boardNumber/$commentNumber';
     try {
       final Map<String, dynamic> requestBody = {
         'content': newContent,
@@ -308,7 +309,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
   }
 
   Future<void> deleteRecipeBoard() async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/${widget.recipeId}';
     try {
       http.Response response = await http.delete(
         Uri.parse(uri),
@@ -418,11 +419,11 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 0.5),
                       child: Container(
-                        width: 450,
-                        height: 200,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width*0.5,
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                           border: Border.all(
                             color: Colors.black,
                             width: 0.3,
@@ -438,7 +439,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                     ),
                 ],
               ),
-            const SizedBox(height: 6),
+            SizedBox(height: MediaQuery.of(context).size.height*0.01),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20.0),
@@ -453,7 +454,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  AutoSizeText(
                     title,
                     style: TextStyle(
                       fontSize: 20,
@@ -487,7 +488,7 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQuery.of(context).size.height*0.01),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(15.0),

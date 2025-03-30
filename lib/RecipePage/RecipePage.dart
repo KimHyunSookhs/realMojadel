@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -79,7 +80,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipeBoard(int type, StreamController<List<RecipeBoardListItem>> streamController, Function(List<RecipeBoardListItem>) onSuccess) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/latest-list/$type';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/latest-list/$type';
     try {
       http.Response response = await http.get(Uri.parse(uri));
       if (response.statusCode == 200) {
@@ -105,7 +106,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _performSearch(String searchWord) async {
-    final String uri = 'http://13.125.228.152:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
+    final String uri = 'http://43.203.230.194:4000/api/v1/recipe/recipe-board/search-list/$searchWord';
     try {
       http.Response response = await http.get(Uri.parse(uri), headers: {
         'Authorization': 'Bearer $_jwtToken',
@@ -356,13 +357,13 @@ class _RecipePageState extends State<RecipePage> {
                 fetchRecipes();
               }
             }),
-            SizedBox(height: 5),
-            RecipeGrid(
+        SizedBox(  height:  MediaQuery.of(context).size.height*0.01,),
+         RecipeGrid(
               recipeList: _generalRecipes,
               streamController: _generalRecipeStreamController,
               onRefresh: fetchRecipes,
             ),
-            SizedBox(height: 10),
+            SizedBox(height:  MediaQuery.of(context).size.height*0.01,),
             SectionHeader(title: '편의점 레시피', onMorePressed: () async {
               final success = await Navigator.push(
                 context,
@@ -372,7 +373,7 @@ class _RecipePageState extends State<RecipePage> {
                 fetchRecipes();
               }
             }),
-            SizedBox(height: 5),
+            SizedBox(height:  MediaQuery.of(context).size.height*0.01,),
             RecipeGrid(
               recipeList: _convenienceStoreRecipes,
               streamController: _convenienceStoreRecipeStreamController,
@@ -441,8 +442,8 @@ class _RecipeGridState extends State<RecipeGrid> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 160,
-                        height: 140,
+                        width:  MediaQuery.of(context).size.width*0.5,
+                        height: MediaQuery.of(context).size.width*0.4,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black, width: 0.3),
                           image: message.boardTitleImage.isNotEmpty
@@ -457,9 +458,10 @@ class _RecipeGridState extends State<RecipeGrid> {
                         ),
                       ),
                       SizedBox(height: 5),
-                      Text(
+                      AutoSizeText(
                         message.title,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        maxFontSize: 15,
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],

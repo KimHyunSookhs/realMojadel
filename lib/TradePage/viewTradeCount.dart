@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 Future<void> increaseTradeViewCount(int tradeId, String jwtToken) async {
-  final String uri = 'http://13.125.228.152:4000/api/v1/trade/trade-board/$tradeId/increase-view-count';
+  final String uri = 'http://43.203.230.194:4000/api/v1/trade/trade-board/$tradeId/increase-view-count';
   try {
     http.Response response = await http.get(Uri.parse(uri), headers: {
       'Authorization': 'Bearer $jwtToken', // 인증 헤더 추가
